@@ -16,7 +16,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        display: ["Bricolage Grotesque", "Plus Jakarta Sans", "sans-serif"],
+        sans: ["General Sans", "Plus Jakarta Sans", "system-ui", "sans-serif"],
       },
       colors: {
         border: "oklch(var(--border))",
@@ -56,6 +57,12 @@ export default {
           DEFAULT: "oklch(var(--teal))",
           light: "oklch(var(--teal-light))",
         },
+        success: {
+          DEFAULT: "oklch(var(--success))",
+        },
+        warning: {
+          DEFAULT: "oklch(var(--warning))",
+        },
         chart: {
           1: "oklch(var(--chart-1))",
           2: "oklch(var(--chart-2))",
@@ -80,9 +87,9 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
-        xs: "0 1px 2px 0 rgba(0,0,0,0.05)",
-        card: "0 1px 3px 0 rgba(0,0,0,0.07), 0 1px 2px -1px rgba(0,0,0,0.05)",
-        nav: "0 2px 8px 0 rgba(0,0,0,0.18)",
+        xs: "0 1px 2px 0 oklch(0 0 0 / 0.3)",
+        card: "0 1px 4px oklch(0 0 0 / 0.4)",
+        nav: "0 2px 8px 0 oklch(0 0 0 / 0.5)",
       },
       keyframes: {
         "accordion-down": {

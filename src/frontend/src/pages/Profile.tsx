@@ -18,7 +18,7 @@ import {
 } from "../hooks/useQueries";
 
 export function Profile() {
-  const { logout, principal } = useAuth();
+  const { logout, user } = useAuth();
   const { data: profile, isLoading: profileLoading } = useMyProfile();
   const { data: stats, isLoading: statsLoading } = useMyStats();
   const { data: progress, isLoading: progressLoading } = useUserProgress();
@@ -65,10 +65,11 @@ export function Profile() {
   const progressPct =
     totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0;
 
-  const initials = name
-    ? name
+  const displayName = profile?.name || user?.displayName || "";
+  const initials = displayName
+    ? displayName
         .split(" ")
-        .map((w) => w[0])
+        .map((w: string) => w[0])
         .join("")
         .toUpperCase()
         .slice(0, 2)
@@ -86,15 +87,8 @@ export function Profile() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Avatar className="w-16 h-16 border-2 border-border shadow-sm">
-              <AvatarFallback
-                className="text-xl font-bold"
-                style={{
-                  background:
-                    "linear-gradient(135deg, oklch(0.22 0.04 245), oklch(0.28 0.07 195))",
-                  color: "white",
-                }}
-              >
-                {profileLoading ? "…" : initials}
+              <AvatarFallback className="bg-primary text-primary-foreground text-xl font-bold">
+                {profileLoading ? "\u2026" : initials}
               </AvatarFallback>
             </Avatar>
             <div>
@@ -105,17 +99,12 @@ export function Profile() {
                 </>
               ) : (
                 <>
-                  <h1 className="text-xl font-bold text-foreground">
-                    {profile?.name || "New User"}
+                  <h1 className="text-xl font-display font-bold text-foreground">
+                    {profile?.name || user?.displayName || "New User"}
                   </h1>
                   <p className="text-sm text-muted-foreground">
-                    {profile?.email || "No email set"}
+                    {user?.email || profile?.email || "No email set"}
                   </p>
-                  {principal && (
-                    <p className="text-xs text-muted-foreground/60 font-mono mt-0.5 truncate max-w-xs">
-                      {principal.toString().slice(0, 20)}…
-                    </p>
-                  )}
                 </>
               )}
             </div>
@@ -127,7 +116,7 @@ export function Profile() {
               logout();
               toast.success("Signed out.");
             }}
-            className="flex items-center gap-1.5 text-destructive border-destructive/30 hover:bg-destructive/5"
+            className="flex items-center gap-1.5 text-destructive border-destructive/40 hover:bg-destructive/10"
             data-ocid="profile.delete_button"
           >
             <LogOut className="w-4 h-4" />
@@ -136,9 +125,12 @@ export function Profile() {
         </div>
 
         {/* Profile Form */}
-        <Card data-ocid="profile.personal_card">
+        <Card
+          className="bg-card border border-border"
+          data-ocid="profile.personal_card"
+        >
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+            <CardTitle className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Personal Information
             </CardTitle>
           </CardHeader>
@@ -175,16 +167,11 @@ export function Profile() {
                   <Button
                     onClick={handleSave}
                     disabled={saveProfile.isPending}
-                    className="flex items-center gap-1.5"
-                    style={{
-                      background:
-                        "linear-gradient(to right, oklch(0.22 0.04 245), oklch(0.28 0.07 195))",
-                      color: "white",
-                    }}
+                    className="flex items-center gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
                     data-ocid="profile.save_button"
                   >
                     <Save className="w-4 h-4" />
-                    {saveProfile.isPending ? "Saving…" : "Save Profile"}
+                    {saveProfile.isPending ? "Saving\u2026" : "Save Profile"}
                   </Button>
                   {profile && (
                     <Button
@@ -194,6 +181,7 @@ export function Profile() {
                         setEmail(profile.email);
                         setEditing(false);
                       }}
+                      className="border-border hover:border-primary/50"
                       data-ocid="profile.cancel_button"
                     >
                       Cancel
@@ -217,7 +205,7 @@ export function Profile() {
                       Email
                     </p>
                     <p className="text-sm font-semibold text-foreground">
-                      {profile?.email || "—"}
+                      {profile?.email || "\u2014"}
                     </p>
                   </div>
                 </div>
@@ -225,7 +213,7 @@ export function Profile() {
                   variant="outline"
                   size="sm"
                   onClick={() => setEditing(true)}
-                  className="w-fit"
+                  className="w-fit border-border hover:border-primary/50"
                   data-ocid="profile.edit_button"
                 >
                   Edit Profile
@@ -236,28 +224,28 @@ export function Profile() {
         </Card>
 
         {/* Stats */}
-        <Card data-ocid="profile.stats_card">
+        <Card
+          className="bg-card border border-border"
+          data-ocid="profile.stats_card"
+        >
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+            <CardTitle className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Performance Stats
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-4">
-              <div className="flex flex-col items-center p-3 rounded-xl bg-muted/40">
-                <div
-                  className="w-9 h-9 rounded-lg flex items-center justify-center mb-2"
-                  style={{ background: "oklch(0.72 0.14 185 / 0.15)" }}
-                >
-                  <BookOpen
-                    className="w-4 h-4"
-                    style={{ color: "oklch(0.45 0.14 185)" }}
-                  />
+              <div className="flex flex-col items-center p-3 rounded-xl bg-background">
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-2 bg-primary/10">
+                  <BookOpen className="w-4 h-4 text-primary" />
                 </div>
                 {statsLoading ? (
                   <Skeleton className="h-6 w-10 mb-1" />
                 ) : (
-                  <p className="text-2xl font-bold" data-ocid="profile.panel">
+                  <p
+                    className="text-2xl font-display font-bold text-primary"
+                    data-ocid="profile.panel"
+                  >
                     {testsAttempted}
                   </p>
                 )}
@@ -266,14 +254,17 @@ export function Profile() {
                 </p>
               </div>
 
-              <div className="flex flex-col items-center p-3 rounded-xl bg-muted/40">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-2 bg-emerald-50">
-                  <Target className="w-4 h-4 text-emerald-600" />
+              <div className="flex flex-col items-center p-3 rounded-xl bg-background">
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-2 bg-success/10">
+                  <Target className="w-4 h-4 text-success" />
                 </div>
                 {statsLoading ? (
                   <Skeleton className="h-6 w-12 mb-1" />
                 ) : (
-                  <p className="text-2xl font-bold" data-ocid="profile.panel">
+                  <p
+                    className="text-2xl font-display font-bold text-success"
+                    data-ocid="profile.panel"
+                  >
                     {accuracy.toFixed(1)}%
                   </p>
                 )}
@@ -282,14 +273,17 @@ export function Profile() {
                 </p>
               </div>
 
-              <div className="flex flex-col items-center p-3 rounded-xl bg-muted/40">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-2 bg-orange-50">
-                  <Zap className="w-4 h-4 text-orange-500" />
+              <div className="flex flex-col items-center p-3 rounded-xl bg-background">
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-2 bg-warning/10">
+                  <Zap className="w-4 h-4 text-warning" />
                 </div>
                 {statsLoading ? (
                   <Skeleton className="h-6 w-10 mb-1" />
                 ) : (
-                  <p className="text-2xl font-bold" data-ocid="profile.panel">
+                  <p
+                    className="text-2xl font-display font-bold text-warning"
+                    data-ocid="profile.panel"
+                  >
                     {totalScore}
                   </p>
                 )}
@@ -302,9 +296,12 @@ export function Profile() {
         </Card>
 
         {/* Progress */}
-        <Card data-ocid="profile.progress_card">
+        <Card
+          className="bg-card border border-border"
+          data-ocid="profile.progress_card"
+        >
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+            <CardTitle className="text-xs font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
               Program Progress
             </CardTitle>
@@ -315,21 +312,21 @@ export function Profile() {
             ) : (
               <>
                 <div className="flex justify-between items-end mb-2">
-                  <span className="text-3xl font-bold text-foreground">
+                  <span className="text-3xl font-display font-bold text-foreground">
                     {completedDays}
                     <span className="text-lg font-normal text-muted-foreground">
                       {" "}
                       / {totalDays}
                     </span>
                   </span>
-                  <span
-                    className="text-sm font-semibold"
-                    style={{ color: "oklch(0.45 0.14 185)" }}
-                  >
+                  <span className="text-sm font-semibold text-primary">
                     {progressPct}%
                   </span>
                 </div>
-                <Progress value={progressPct} className="h-2" />
+                <Progress
+                  value={progressPct}
+                  className="h-2 [&>div]:bg-primary"
+                />
                 <p className="text-xs text-muted-foreground mt-2">
                   Days completed in program
                 </p>

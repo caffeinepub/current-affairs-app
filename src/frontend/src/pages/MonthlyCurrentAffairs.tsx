@@ -89,7 +89,7 @@ function DayRow({
         onClick={onToggle}
         className={`w-full flex items-center justify-between px-4 py-2.5 text-left transition-colors ${
           hasNews
-            ? "hover:bg-muted/50 cursor-pointer"
+            ? "hover:bg-muted/30 cursor-pointer"
             : "cursor-default opacity-60"
         }`}
         disabled={!hasNews}
@@ -126,7 +126,7 @@ function DayRow({
               {news.map((item) => (
                 <div
                   key={String(item.id)}
-                  className="bg-muted/30 rounded-lg px-3 py-2.5 border border-border/60"
+                  className="bg-background border border-border rounded-lg px-3 py-2.5"
                 >
                   {!quickMode && (
                     <span
@@ -191,7 +191,7 @@ function MonthRow({
   return (
     <motion.div
       layout
-      className="bg-card border border-border rounded-xl overflow-hidden shadow-card"
+      className="bg-card border border-border rounded-xl overflow-hidden shadow-card hover:border-primary/40 transition-colors"
       data-ocid={`monthly_ca.month.${index + 1}.panel`}
     >
       <button
@@ -201,14 +201,13 @@ function MonthRow({
         data-ocid={`monthly_ca.month.${index + 1}.button`}
       >
         <div className="flex items-center gap-3">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-            style={{ background: "oklch(0.72 0.14 185 / 0.12)" }}
-          >
-            <BookOpen className="w-4 h-4 text-teal" />
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-primary/10">
+            <BookOpen className="w-4 h-4 text-primary" />
           </div>
           <div className="text-left">
-            <p className="text-sm font-semibold text-foreground">{label}</p>
+            <p className="text-sm font-semibold text-foreground font-display">
+              {label}
+            </p>
             <p className="text-xs text-muted-foreground mt-0.5">
               {daysWithNews > 0
                 ? `${daysWithNews} days with news`
@@ -290,7 +289,7 @@ export function MonthlyCurrentAffairs() {
         className="flex items-center justify-between gap-3 mb-6"
       >
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-display font-bold text-foreground">
             Monthly Current Affairs
           </h1>
           <p className="text-muted-foreground text-sm mt-0.5">
@@ -301,13 +300,12 @@ export function MonthlyCurrentAffairs() {
           variant={quickMode ? "default" : "outline"}
           size="sm"
           onClick={() => setQuickMode((v) => !v)}
-          className="flex items-center gap-2 flex-shrink-0"
-          data-ocid="monthly_ca.toggle"
-          style={
+          className={`flex items-center gap-2 flex-shrink-0 ${
             quickMode
-              ? { background: "oklch(0.72 0.14 185)", color: "white" }
-              : {}
-          }
+              ? "bg-primary text-primary-foreground hover:bg-primary/90"
+              : "border-border hover:border-primary/50"
+          }`}
+          data-ocid="monthly_ca.toggle"
         >
           {quickMode ? (
             <EyeOff className="w-3.5 h-3.5" />
@@ -325,16 +323,9 @@ export function MonthlyCurrentAffairs() {
         <motion.div
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-4 px-4 py-2.5 rounded-lg border text-sm text-foreground flex items-center gap-2"
-          style={{
-            background: "oklch(0.72 0.14 185 / 0.08)",
-            borderColor: "oklch(0.72 0.14 185 / 0.3)",
-          }}
+          className="mb-4 px-4 py-2.5 rounded-lg border text-sm text-primary flex items-center gap-2 bg-primary/10 border-primary/30"
         >
-          <Eye
-            className="w-4 h-4 flex-shrink-0"
-            style={{ color: "oklch(0.72 0.14 185)" }}
-          />
+          <Eye className="w-4 h-4 flex-shrink-0 text-primary" />
           <span>Quick Revision Mode — only titles shown</span>
         </motion.div>
       )}

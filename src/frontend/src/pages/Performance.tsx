@@ -30,20 +30,20 @@ function accuracy(score: number, total: number) {
 function AccuracyBadge({ pct }: { pct: number }) {
   if (pct >= 70) {
     return (
-      <Badge className="bg-emerald-100 text-emerald-700 border-0 text-xs font-semibold">
+      <Badge className="bg-success/20 text-success border-0 text-xs font-semibold">
         {pct}%
       </Badge>
     );
   }
   if (pct >= 50) {
     return (
-      <Badge className="bg-yellow-100 text-yellow-700 border-0 text-xs font-semibold">
+      <Badge className="bg-warning/20 text-warning border-0 text-xs font-semibold">
         {pct}%
       </Badge>
     );
   }
   return (
-    <Badge className="bg-red-100 text-red-600 border-0 text-xs font-semibold">
+    <Badge className="bg-destructive/20 text-destructive border-0 text-xs font-semibold">
       {pct}%
     </Badge>
   );
@@ -64,44 +64,62 @@ const bestEntry = TEST_HISTORY.find(
 const lastEntry = TEST_HISTORY[0];
 const lastPct = accuracy(lastEntry.score, lastEntry.total);
 
-const STAT_CARDS = [
+type StatCard = {
+  label: string;
+  value: string;
+  icon: typeof ClipboardList;
+  iconClass: string;
+  bgClass: string;
+  valueClass: string;
+};
+
+const STAT_CARDS: StatCard[] = [
   {
     label: "Tests Attempted",
     value: String(totalAttempted),
     icon: ClipboardList,
-    color: "oklch(0.22 0.04 245)",
-    bg: "oklch(0.22 0.04 245 / 0.08)",
+    iconClass: "text-primary",
+    bgClass: "bg-primary/10",
+    valueClass: "text-primary",
   },
   {
     label: "Overall Accuracy",
     value: `${overallAccuracy}%`,
     icon: Target,
-    color: "oklch(0.72 0.14 185)",
-    bg: "oklch(0.72 0.14 185 / 0.08)",
+    iconClass: "text-teal",
+    bgClass: "bg-teal/10",
+    valueClass: "text-teal",
   },
   {
     label: "Best Score",
     value: `${bestEntry.score}/${bestEntry.total}`,
     icon: Award,
-    color: "oklch(0.75 0.18 85)",
-    bg: "oklch(0.75 0.18 85 / 0.08)",
+    iconClass: "text-warning",
+    bgClass: "bg-warning/10",
+    valueClass: "text-warning",
   },
   {
     label: "Last Test Score",
     value: `${lastEntry.score}/${lastEntry.total}`,
     icon: CheckCircle2,
-    color:
+    iconClass:
       lastPct >= 70
-        ? "oklch(0.62 0.16 160)"
+        ? "text-success"
         : lastPct >= 50
-          ? "oklch(0.75 0.18 85)"
-          : "oklch(0.58 0.22 27)",
-    bg:
+          ? "text-warning"
+          : "text-destructive",
+    bgClass:
       lastPct >= 70
-        ? "oklch(0.62 0.16 160 / 0.08)"
+        ? "bg-success/10"
         : lastPct >= 50
-          ? "oklch(0.75 0.18 85 / 0.08)"
-          : "oklch(0.58 0.22 27 / 0.08)",
+          ? "bg-warning/10"
+          : "bg-destructive/10",
+    valueClass:
+      lastPct >= 70
+        ? "text-success"
+        : lastPct >= 50
+          ? "text-warning"
+          : "text-destructive",
   },
 ];
 
@@ -114,7 +132,9 @@ export function Performance() {
         transition={{ duration: 0.35, ease: "easeOut" }}
       >
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-foreground">Performance</h1>
+          <h1 className="text-2xl font-display font-bold text-foreground">
+            Performance
+          </h1>
           <p className="text-muted-foreground text-sm mt-0.5">
             Track your quiz and mock test results.
           </p>
@@ -141,18 +161,16 @@ export function Performance() {
                 data-ocid={`performance.card.${(i + 1) as 1 | 2 | 3 | 4}`}
               >
                 <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center"
-                  style={{ background: card.bg }}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${card.bgClass}`}
                 >
-                  <Icon className="w-4 h-4" style={{ color: card.color }} />
+                  <Icon className={`w-4 h-4 ${card.iconClass}`} />
                 </div>
                 <div>
                   <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-medium leading-tight">
                     {card.label}
                   </p>
                   <p
-                    className="text-2xl font-bold mt-0.5 leading-none"
-                    style={{ color: card.color }}
+                    className={`text-2xl font-display font-bold mt-0.5 leading-none ${card.valueClass}`}
                   >
                     {card.value}
                   </p>
@@ -171,7 +189,7 @@ export function Performance() {
           data-ocid="performance.table"
         >
           <div className="px-5 py-4 border-b border-border">
-            <h2 className="font-semibold text-foreground text-sm">
+            <h2 className="font-semibold text-foreground text-sm uppercase tracking-widest text-muted-foreground">
               Test History
             </h2>
           </div>

@@ -1,15 +1,44 @@
-import { useInternetIdentity } from "@/hooks/useInternetIdentity";
+import {
+  GoogleAuthProvider,
+  type User,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth";
+import { useEffect, useState } from "react";
+import { auth } from "./firebase";
 
 export function useAuth() {
-  const { identity, login, clear, isInitializing } = useInternetIdentity();
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const isAuthenticated = !!identity && !identity.getPrincipal().isAnonymous();
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+      setIsLoading(false);
+    });
+    return unsubscribe;
+  }, []);
+
+  const loginWithEmail = (email: string, password: string) =>
+    signInWithEmailAndPassword(auth, email, password);
+
+  const signupWithEmail = (email: string, password: string) =>
+    createUserWithEmailAndPassword(auth, email, password);
+
+  const loginWithGoogle = () => signInWithPopup(auth, new GoogleAuthProvider());
+
+  const logout = () => signOut(auth);
 
   return {
-    isAuthenticated,
-    isLoading: isInitializing,
-    login,
-    logout: clear,
-    principal: identity?.getPrincipal(),
+    isAuthenticated: !!user,
+    isLoading,
+    user,
+    loginWithEmail,
+    signupWithEmail,
+    loginWithGoogle,
+    logout,
   };
 }

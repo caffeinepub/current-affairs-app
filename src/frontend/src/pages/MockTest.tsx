@@ -528,13 +528,13 @@ const QUESTIONS: Question[] = [
 type Status = "not-visited" | "not-attempted" | "answered" | "marked";
 
 const TOPIC_COLORS: Record<string, string> = {
-  Economy: "text-emerald-600 bg-emerald-50",
-  International: "text-orange-600 bg-orange-50",
-  Technology: "text-cyan-600 bg-cyan-50",
-  Science: "text-violet-600 bg-violet-50",
-  Environment: "text-green-600 bg-green-50",
-  Politics: "text-blue-600 bg-blue-50",
-  Sports: "text-yellow-700 bg-yellow-50",
+  Economy: "text-emerald-400 bg-emerald-400/10",
+  International: "text-orange-400 bg-orange-400/10",
+  Technology: "text-cyan-400 bg-cyan-400/10",
+  Science: "text-violet-400 bg-violet-400/10",
+  Environment: "text-green-400 bg-green-400/10",
+  Politics: "text-blue-400 bg-blue-400/10",
+  Sports: "text-yellow-400 bg-yellow-400/10",
 };
 
 export function MockTest() {
@@ -621,11 +621,6 @@ export function MockTest() {
   }, []);
 
   const markAndNext = useCallback(() => {
-    setStatuses((prev) => {
-      const next = [...prev];
-      // Use functional update to get latest current - need to capture current
-      return next;
-    });
     setCurrent((c) => {
       setStatuses((prev) => {
         const next = [...prev];
@@ -652,11 +647,12 @@ export function MockTest() {
   const timeTaken = Math.floor((Date.now() - startTime) / 1000);
 
   function statusColor(s: Status, isCurrent: boolean): string {
-    if (isCurrent) return "bg-blue-500 text-white border-blue-600";
-    if (s === "answered") return "bg-green-500 text-white border-green-600";
-    if (s === "marked") return "bg-yellow-400 text-gray-900 border-yellow-500";
-    if (s === "not-attempted") return "bg-white text-gray-700 border-gray-300";
-    return "bg-gray-200 text-gray-500 border-gray-300";
+    if (isCurrent) return "bg-primary text-white border-2 border-white/30";
+    if (s === "answered") return "bg-success/80 text-white border-success";
+    if (s === "marked") return "bg-warning/80 text-white border-warning";
+    if (s === "not-attempted")
+      return "bg-destructive/70 text-white border-destructive";
+    return "bg-border text-muted-foreground border-border";
   }
 
   // ─── RESULTS SCREEN ───────────────────────────────────────────────────────
@@ -664,21 +660,21 @@ export function MockTest() {
     const pct = Math.round((score / 50) * 100);
     const mm = Math.floor(timeTaken / 60);
     const ss = timeTaken % 60;
+    const scoreColor =
+      pct >= 70
+        ? "text-success"
+        : pct >= 50
+          ? "text-warning"
+          : "text-destructive";
     return (
       <div className="min-h-screen bg-background" data-ocid="mock_test.panel">
         <div className="max-w-3xl mx-auto px-4 py-8">
           <div className="text-center mb-8">
-            <div
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-4"
-              style={{
-                background: "oklch(0.72 0.14 185 / 0.12)",
-                color: "oklch(0.45 0.14 185)",
-              }}
-            >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-4 bg-primary/10 text-primary border border-primary/30">
               <BookOpen className="w-4 h-4" />
               Test Completed
             </div>
-            <h1 className="text-3xl font-bold text-foreground mb-1">
+            <h1 className="text-3xl font-display font-bold text-foreground mb-1">
               Your Results
             </h1>
             <p className="text-muted-foreground">
@@ -687,33 +683,34 @@ export function MockTest() {
           </div>
 
           {/* Score card */}
-          <div
-            className="rounded-2xl p-6 mb-8 text-center border"
-            style={{
-              background:
-                "linear-gradient(135deg, oklch(0.22 0.04 245), oklch(0.28 0.07 195))",
-              borderColor: "oklch(0.72 0.14 185 / 0.3)",
-            }}
-          >
-            <p className="text-5xl font-bold text-white mb-1">
+          <div className="bg-card rounded-2xl p-6 mb-8 text-center border border-primary/30">
+            <p className={`text-5xl font-display font-bold mb-1 ${scoreColor}`}>
               {score}
-              <span className="text-2xl text-white/60">/50</span>
+              <span className="text-2xl font-normal text-muted-foreground">
+                /50
+              </span>
             </p>
-            <p className="text-white/70 text-lg">{pct}%</p>
+            <p className={`text-lg font-semibold ${scoreColor}`}>{pct}%</p>
             <div className="grid grid-cols-3 gap-4 mt-6">
-              <div className="bg-white/10 rounded-xl py-3">
-                <p className="text-xl font-bold text-white">{score}</p>
-                <p className="text-xs text-white/60 mt-0.5">Correct</p>
+              <div className="bg-background rounded-xl py-3">
+                <p className="text-xl font-bold text-success">{score}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Correct</p>
               </div>
-              <div className="bg-white/10 rounded-xl py-3">
-                <p className="text-xl font-bold text-white">{50 - score}</p>
-                <p className="text-xs text-white/60 mt-0.5">Wrong/Skipped</p>
+              <div className="bg-background rounded-xl py-3">
+                <p className="text-xl font-bold text-destructive">
+                  {50 - score}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Wrong/Skipped
+                </p>
               </div>
-              <div className="bg-white/10 rounded-xl py-3">
-                <p className="text-xl font-bold text-white">
+              <div className="bg-background rounded-xl py-3">
+                <p className="text-xl font-bold text-foreground">
                   {mm}m {ss}s
                 </p>
-                <p className="text-xs text-white/60 mt-0.5">Time Taken</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Time Taken
+                </p>
               </div>
             </div>
           </div>
@@ -730,24 +727,24 @@ export function MockTest() {
               return (
                 <div
                   key={q.id}
-                  className="bg-card border rounded-xl p-4 shadow-card"
+                  className="bg-card border border-border rounded-xl p-4 shadow-card"
                   data-ocid={`mock_test.review.item.${i + 1}`}
                 >
                   <div className="flex items-start gap-3">
                     <span
                       className={`flex-shrink-0 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center mt-0.5 ${
                         isSkipped
-                          ? "bg-gray-200 text-gray-600"
+                          ? "bg-border text-muted-foreground"
                           : isCorrect
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
+                            ? "bg-success/20 text-success"
+                            : "bg-destructive/20 text-destructive"
                       }`}
                     >
                       {i + 1}
                     </span>
                     <div className="flex-1 min-w-0">
                       <span
-                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-full inline-block mb-1.5 ${TOPIC_COLORS[q.topic] ?? "bg-slate-100 text-slate-600"}`}
+                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-full inline-block mb-1.5 ${TOPIC_COLORS[q.topic] ?? "bg-border/20 text-muted-foreground"}`}
                       >
                         {q.topic}
                       </span>
@@ -759,9 +756,10 @@ export function MockTest() {
                           let cls = "text-xs px-3 py-1.5 rounded-lg border ";
                           if (oi === q.correct)
                             cls +=
-                              "border-green-400 bg-green-50 text-green-800 font-semibold";
+                              "border-success bg-success/10 text-success font-semibold";
                           else if (oi === userAns && !isCorrect)
-                            cls += "border-red-400 bg-red-50 text-red-800";
+                            cls +=
+                              "border-destructive bg-destructive/10 text-destructive";
                           else cls += "border-border text-muted-foreground";
                           return (
                             <div
@@ -773,10 +771,10 @@ export function MockTest() {
                               </span>
                               {opt}
                               {oi === q.correct && (
-                                <CheckCircle2 className="w-3.5 h-3.5 ml-auto flex-shrink-0 text-green-600" />
+                                <CheckCircle2 className="w-3.5 h-3.5 ml-auto flex-shrink-0 text-success" />
                               )}
                               {oi === userAns && !isCorrect && (
-                                <XCircle className="w-3.5 h-3.5 ml-auto flex-shrink-0 text-red-600" />
+                                <XCircle className="w-3.5 h-3.5 ml-auto flex-shrink-0 text-destructive" />
                               )}
                             </div>
                           );
@@ -802,19 +800,19 @@ export function MockTest() {
   // ─── EXAM SCREEN ──────────────────────────────────────────────────────────
   return (
     <div
-      className="h-screen flex flex-col bg-gray-50 overflow-hidden select-none"
+      className="h-screen flex flex-col bg-background overflow-hidden select-none"
       data-ocid="mock_test.panel"
     >
       {/* Fullscreen banner */}
       {!isFullScreen && (
-        <div className="bg-yellow-50 border-b border-yellow-200 px-4 py-2 flex items-center justify-between text-sm">
-          <span className="text-yellow-800">
+        <div className="bg-warning/10 border-b border-warning/30 px-4 py-2 flex items-center justify-between text-sm">
+          <span className="text-warning">
             For the best exam experience, use full-screen mode.
           </span>
           <button
             type="button"
             onClick={handleEnterFullscreen}
-            className="flex items-center gap-1.5 text-yellow-800 font-semibold hover:text-yellow-900"
+            className="flex items-center gap-1.5 text-warning font-semibold hover:text-warning/80"
             data-ocid="mock_test.toggle"
           >
             <Maximize2 className="w-4 h-4" /> Enter Full Screen
@@ -823,17 +821,14 @@ export function MockTest() {
       )}
 
       {/* TOP BAR */}
-      <header className="flex-shrink-0 bg-white border-b border-gray-200 shadow-xs">
+      <header className="flex-shrink-0 bg-card border-b border-border shadow-xs">
         <div className="flex items-center h-12 px-4 gap-4">
           <div className="flex items-center gap-2 flex-shrink-0">
-            <BookOpen
-              className="w-4 h-4"
-              style={{ color: "oklch(0.72 0.14 185)" }}
-            />
-            <span className="font-bold text-gray-800 text-sm hidden sm:block">
+            <BookOpen className="w-4 h-4 text-teal" />
+            <span className="font-display font-bold text-foreground text-sm hidden sm:block">
               Current Affairs Mock Test
             </span>
-            <span className="font-bold text-gray-800 text-sm sm:hidden">
+            <span className="font-display font-bold text-foreground text-sm sm:hidden">
               Mock Test
             </span>
           </div>
@@ -842,8 +837,8 @@ export function MockTest() {
             <div
               className={`flex items-center gap-2 px-4 py-1.5 rounded-full font-mono text-sm font-bold transition-colors ${
                 timerCritical
-                  ? "bg-red-100 text-red-700 animate-pulse"
-                  : "bg-gray-100 text-gray-700"
+                  ? "bg-destructive/10 text-destructive animate-pulse"
+                  : "bg-background text-warning"
               }`}
               data-ocid="mock_test.panel"
             >
@@ -853,9 +848,8 @@ export function MockTest() {
 
           <Button
             size="sm"
-            variant="destructive"
+            className="flex-shrink-0 bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={() => setShowSubmitDialog(true)}
-            className="flex-shrink-0"
             data-ocid="mock_test.submit_button"
           >
             Submit Test
@@ -866,9 +860,9 @@ export function MockTest() {
       {/* BODY */}
       <div className="flex flex-1 overflow-hidden">
         {/* LEFT PALETTE — desktop */}
-        <aside className="hidden lg:flex flex-col w-56 bg-white border-r border-gray-200 flex-shrink-0">
-          <div className="px-4 py-3 border-b border-gray-100">
-            <p className="text-xs font-bold uppercase tracking-widest text-gray-500">
+        <aside className="hidden lg:flex flex-col w-56 bg-card border-r border-border flex-shrink-0">
+          <div className="px-4 py-3 border-b border-border">
+            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
               Question Palette
             </p>
           </div>
@@ -878,17 +872,17 @@ export function MockTest() {
               <div className="grid grid-cols-2 gap-1 mb-3">
                 {(
                   [
-                    ["bg-gray-200", "Not Visited"],
-                    ["bg-white border border-gray-300", "Not Attempted"],
-                    ["bg-green-500", "Answered"],
-                    ["bg-yellow-400", "Marked"],
+                    ["bg-border", "Not Visited"],
+                    ["bg-destructive/70", "Not Attempted"],
+                    ["bg-success/80", "Answered"],
+                    ["bg-warning/80", "Marked"],
                   ] as [string, string][]
                 ).map(([cls, label]) => (
                   <div key={label} className="flex items-center gap-1.5">
                     <span
                       className={`w-3 h-3 rounded-sm flex-shrink-0 ${cls}`}
                     />
-                    <span className="text-[9px] text-gray-500 leading-tight">
+                    <span className="text-[9px] text-muted-foreground leading-tight">
                       {label}
                     </span>
                   </div>
@@ -914,17 +908,15 @@ export function MockTest() {
             <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
               {/* Question header */}
               <div className="flex items-center gap-3 mb-4">
-                <span className="text-xs text-gray-500 font-medium">
-                  Question{" "}
-                  <span className="font-bold text-gray-800">{current + 1}</span>{" "}
-                  of 50
+                <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-primary/10 text-primary border border-primary/30">
+                  Q {current + 1} / 50
                 </span>
                 <span
-                  className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${TOPIC_COLORS[q.topic] ?? "bg-slate-100 text-slate-600"}`}
+                  className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${TOPIC_COLORS[q.topic] ?? "bg-border/20 text-muted-foreground"}`}
                 >
                   {q.topic}
                 </span>
-                <span className="ml-auto text-xs text-gray-400">
+                <span className="ml-auto text-xs text-muted-foreground">
                   {statuses[current] === "answered"
                     ? "✓ Answered"
                     : statuses[current] === "marked"
@@ -934,8 +926,8 @@ export function MockTest() {
               </div>
 
               {/* Question text */}
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-card p-5 mb-5">
-                <p className="text-base font-semibold text-gray-900 leading-relaxed">
+              <div className="bg-card rounded-xl border border-border shadow-card p-5 mb-5">
+                <p className="text-base font-semibold text-foreground leading-relaxed">
                   {q.question}
                 </p>
               </div>
@@ -951,16 +943,16 @@ export function MockTest() {
                       onClick={() => selectOption(i)}
                       className={`w-full text-left px-4 py-3.5 rounded-xl border-2 text-sm font-medium transition-all duration-150 flex items-center gap-3 ${
                         isSelected
-                          ? "border-blue-500 bg-blue-50 text-blue-800"
-                          : "border-gray-200 bg-white text-gray-800 hover:border-gray-400 hover:bg-gray-50"
+                          ? "border-primary bg-primary/15 text-foreground"
+                          : "border-border bg-card text-foreground hover:border-primary/50 hover:bg-primary/5"
                       }`}
                       data-ocid={`mock_test.row.${current + 1}`}
                     >
                       <span
                         className={`w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold border-2 transition-colors ${
                           isSelected
-                            ? "border-blue-500 bg-blue-500 text-white"
-                            : "border-gray-300 text-gray-500"
+                            ? "border-primary bg-primary text-white"
+                            : "border-border text-muted-foreground"
                         }`}
                       >
                         {["A", "B", "C", "D"][i]}
@@ -974,14 +966,14 @@ export function MockTest() {
           </ScrollArea>
 
           {/* BOTTOM NAV */}
-          <div className="flex-shrink-0 bg-white border-t border-gray-200 px-4 py-3">
+          <div className="flex-shrink-0 bg-card border-t border-border px-4 py-3">
             <div className="max-w-2xl mx-auto flex items-center justify-between gap-3">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrent((c) => Math.max(0, c - 1))}
                 disabled={isFirstQuestion}
-                className="flex items-center gap-1.5"
+                className="flex items-center gap-1.5 border-border hover:border-primary/50"
                 data-ocid="mock_test.pagination_prev"
               >
                 <ChevronLeft className="w-4 h-4" /> Previous
@@ -990,7 +982,7 @@ export function MockTest() {
               {/* Mobile palette toggle */}
               <button
                 type="button"
-                className="lg:hidden text-xs font-semibold px-3 py-1.5 rounded-full border border-gray-300 text-gray-600"
+                className="lg:hidden text-xs font-semibold px-3 py-1.5 rounded-full border border-border text-muted-foreground hover:border-primary/50"
                 onClick={() => setShowPalette((v) => !v)}
                 data-ocid="mock_test.toggle"
               >
@@ -1002,7 +994,7 @@ export function MockTest() {
                   variant="outline"
                   size="sm"
                   onClick={markAndNext}
-                  className="flex items-center gap-1 text-yellow-700 border-yellow-300 hover:bg-yellow-50"
+                  className="flex items-center gap-1 text-warning border-warning/50 hover:bg-warning/10"
                   data-ocid="mock_test.secondary_button"
                 >
                   Mark & Next
@@ -1011,8 +1003,7 @@ export function MockTest() {
                   size="sm"
                   onClick={saveAndNext}
                   disabled={isLastQuestion}
-                  className="flex items-center gap-1.5"
-                  style={{ background: "oklch(0.72 0.14 185)", color: "white" }}
+                  className="flex items-center gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
                   data-ocid="mock_test.primary_button"
                 >
                   Save & Next <ChevronRight className="w-4 h-4" />
@@ -1023,7 +1014,7 @@ export function MockTest() {
                 size="sm"
                 variant="outline"
                 onClick={markAndNext}
-                className="sm:hidden text-yellow-700 border-yellow-300"
+                className="sm:hidden text-warning border-warning/50"
                 data-ocid="mock_test.secondary_button"
               >
                 Mark
@@ -1032,8 +1023,7 @@ export function MockTest() {
                 size="sm"
                 onClick={saveAndNext}
                 disabled={isLastQuestion}
-                style={{ background: "oklch(0.72 0.14 185)", color: "white" }}
-                className="sm:hidden"
+                className="sm:hidden bg-primary text-primary-foreground hover:bg-primary/90"
                 data-ocid="mock_test.pagination_next"
               >
                 Next <ChevronRight className="w-4 h-4" />
@@ -1051,17 +1041,17 @@ export function MockTest() {
         >
           <button
             type="button"
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-black/60"
             onClick={() => setShowPalette(false)}
           />
-          <div className="absolute right-0 top-0 bottom-0 w-64 bg-white shadow-xl flex flex-col">
-            <div className="px-4 py-3 border-b flex items-center justify-between">
-              <p className="text-sm font-bold text-gray-800">
+          <div className="absolute right-0 top-0 bottom-0 w-64 bg-card border-l border-border shadow-xl flex flex-col">
+            <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+              <p className="text-sm font-bold text-foreground">
                 Question Palette
               </p>
               <button
                 type="button"
-                className="text-gray-400 hover:text-gray-600"
+                className="text-muted-foreground hover:text-foreground"
                 onClick={() => setShowPalette(false)}
                 data-ocid="mock_test.close_button"
               >
