@@ -16,16 +16,18 @@ import {
   Newspaper,
   User,
 } from "lucide-react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   useMarkDayCompleted,
+  useMyProfile,
   useNewsItems,
   usePrepopulate,
+  useSaveProfile,
   useUserProgress,
 } from "./hooks/useQueries";
-import { useAuth } from "./lib/auth";
+import { getFirebaseErrorMessage, useAuth } from "./lib/auth";
 import { formatBigIntDate, getCategoryColor } from "./lib/utils-ca";
 import { CAQuiz } from "./pages/CAQuiz";
 import { DailyCurrentAffairs } from "./pages/DailyCurrentAffairs";
@@ -238,9 +240,162 @@ function AppShell({
   );
 }
 
+// Profile setup modal — shown after first login until name is saved
+function ProfileSetupModal({ onDone }: { onDone: () => void }) {
+  const { user } = useAuth();
+  const saveProfile = useSaveProfile();
+  const [name, setName] = useState(user?.displayName ?? "");
+  const [examGoal, setExamGoal] = useState(
+    () => localStorage.getItem("examGoal") ?? "TS LAWCET 2026",
+  );
+  const [error, setError] = useState("");
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    if (!name.trim()) {
+      setError("Please enter your name.");
+      return;
+    }
+    localStorage.setItem("examGoal", examGoal.trim());
+    saveProfile.mutate(
+      { name: name.trim(), email: user?.email ?? "" },
+      {
+        onSuccess: () => {
+          toast.success(`Welcome, ${name.trim()}! Profile saved.`);
+          onDone();
+        },
+        onError: () => setError("Failed to save profile. Please try again."),
+      },
+    );
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-sm p-4"
+      data-ocid="profile_setup.modal"
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+        className="w-full max-w-sm"
+      >
+        <div className="bg-card rounded-2xl border border-border shadow-xl p-8 flex flex-col gap-6">
+          {/* Header */}
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-primary/10 border border-primary/20">
+              <BookOpen className="w-7 h-7 text-primary" />
+            </div>
+            <div className="text-center">
+              <h2 className="text-xl font-display font-bold text-foreground">
+                Complete Your Profile
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Set up your profile to personalize your experience
+              </p>
+            </div>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSave} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="setup-name"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              >
+                Your Name <span className="text-destructive">*</span>
+              </label>
+              <input
+                id="setup-name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your full name"
+                className="w-full px-3 py-2.5 rounded-lg text-sm bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+                data-ocid="profile_setup.input"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="setup-goal"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              >
+                Exam Goal
+              </label>
+              <input
+                id="setup-goal"
+                type="text"
+                value={examGoal}
+                onChange={(e) => setExamGoal(e.target.value)}
+                placeholder="e.g. TS LAWCET 2026"
+                className="w-full px-3 py-2.5 rounded-lg text-sm bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+                data-ocid="profile_setup.input"
+              />
+            </div>
+
+            {error && (
+              <p
+                className="text-xs text-destructive bg-destructive/10 rounded-lg px-3 py-2"
+                data-ocid="profile_setup.error_state"
+              >
+                {error}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={saveProfile.isPending}
+              className="w-full py-2.5 px-6 rounded-xl text-sm font-semibold text-primary-foreground bg-primary hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60 flex items-center justify-center gap-2 mt-1"
+              data-ocid="profile_setup.submit_button"
+            >
+              {saveProfile.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Saving…
+                </>
+              ) : (
+                "Save & Continue"
+              )}
+            </button>
+          </form>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+function ExamCountdown() {
+  const examDate = new Date("2026-05-18");
+  const now = new Date();
+  const daysLeft = Math.max(
+    0,
+    Math.ceil((examDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
+  );
+
+  return (
+    <div
+      className="flex flex-col items-center justify-center rounded-xl px-5 py-4 min-w-[120px] bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/30"
+      data-ocid="dashboard.countdown_card"
+    >
+      <span className="text-4xl font-display font-bold text-primary leading-none">
+        {daysLeft}
+      </span>
+      <span className="text-[11px] text-muted-foreground uppercase tracking-widest mt-1 text-center">
+        Days to TS LAWCET
+      </span>
+      <span className="text-[10px] text-muted-foreground/70 mt-0.5">
+        18 May 2026
+      </span>
+    </div>
+  );
+}
+
 function Dashboard() {
   const { data: progress, isLoading: progressLoading } = useUserProgress();
   const { data: newsItems, isLoading: newsLoading } = useNewsItems();
+  const { data: profile } = useMyProfile();
   const prepopulate = usePrepopulate();
   const markDay = useMarkDayCompleted();
 
@@ -256,6 +411,8 @@ function Dashboard() {
   const progressPct =
     totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0;
 
+  const displayName = profile?.name || "";
+
   function handleStartQuiz() {
     markDay.mutate(undefined, {
       onSuccess: () => toast.success("Day marked as completed! Quiz started."),
@@ -265,6 +422,22 @@ function Dashboard() {
 
   return (
     <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 py-6">
+      {/* WELCOME + COUNTDOWN BANNER */}
+      <div
+        className="bg-card rounded-lg border border-border shadow-card mb-6 px-5 py-5 flex flex-col sm:flex-row items-start sm:items-center gap-4"
+        data-ocid="dashboard.welcome_card"
+      >
+        <div className="flex-1">
+          <h2 className="text-2xl font-display font-bold text-foreground leading-tight">
+            {displayName ? `Welcome back, ${displayName}! 👋` : "Welcome! 👋"}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            TS LAWCET Preparation
+          </p>
+        </div>
+        <ExamCountdown />
+      </div>
+
       {/* SUMMARY STRIP */}
       <div className="bg-card rounded-lg border border-border shadow-card mb-6">
         <div className="px-4 sm:px-6 py-3">
@@ -545,7 +718,13 @@ function GoogleIcon({ className }: { className?: string }) {
 }
 
 function LoginScreen() {
-  const { loginWithEmail, signupWithEmail, loginWithGoogle } = useAuth();
+  const {
+    loginWithEmail,
+    signupWithEmail,
+    loginWithGoogle,
+    googleRedirectError,
+    clearGoogleRedirectError,
+  } = useAuth();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -553,30 +732,13 @@ function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  function getErrorMessage(code: string): string {
-    switch (code) {
-      case "auth/user-not-found":
-      case "auth/wrong-password":
-      case "auth/invalid-credential":
-        return "Invalid email or password. Please try again.";
-      case "auth/email-already-in-use":
-        return "An account with this email already exists. Please sign in.";
-      case "auth/weak-password":
-        return "Password must be at least 6 characters.";
-      case "auth/invalid-email":
-        return "Please enter a valid email address.";
-      case "auth/popup-closed-by-user":
-        return "Google sign-in was cancelled.";
-      case "auth/network-request-failed":
-        return "Network error. Please check your connection.";
-      default:
-        return "Something went wrong. Please try again.";
-    }
-  }
+  // Show any error that came back from the Google redirect
+  const displayError = error || googleRedirectError || "";
 
   async function handleEmailAuth(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    clearGoogleRedirectError();
     if (!email.trim() || !password.trim()) {
       setError("Please enter your email and password.");
       return;
@@ -589,7 +751,7 @@ function LoginScreen() {
         await signupWithEmail(email, password);
       }
     } catch (err: any) {
-      setError(getErrorMessage(err?.code ?? ""));
+      setError(getFirebaseErrorMessage(err?.code ?? ""));
     } finally {
       setLoading(false);
     }
@@ -597,12 +759,13 @@ function LoginScreen() {
 
   async function handleGoogle() {
     setError("");
+    clearGoogleRedirectError();
     setGoogleLoading(true);
     try {
       await loginWithGoogle();
+      // Page will redirect to Google — no further handling needed here
     } catch (err: any) {
-      setError(getErrorMessage(err?.code ?? ""));
-    } finally {
+      setError(getFirebaseErrorMessage(err?.code ?? ""));
       setGoogleLoading(false);
     }
   }
@@ -713,12 +876,12 @@ function LoginScreen() {
             </div>
 
             {/* Error message */}
-            {error && (
+            {displayError && (
               <p
                 className="text-xs text-destructive bg-destructive/10 rounded-lg px-3 py-2"
                 data-ocid="login.error_state"
               >
-                {error}
+                {displayError}
               </p>
             )}
 
@@ -770,8 +933,16 @@ function LoginScreen() {
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
   const [activePage, setActivePage] = useState<Page>("dashboard");
+  const { data: profile, isLoading: profileLoading } = useMyProfile();
+  const [profileModalDismissed, setProfileModalDismissed] = useState(false);
 
-  if (isLoading) {
+  const showProfileSetup =
+    isAuthenticated &&
+    !profileLoading &&
+    !profileModalDismissed &&
+    (!profile || !profile.name || profile.name.trim() === "");
+
+  if (isLoading || (isAuthenticated && profileLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div
@@ -794,6 +965,11 @@ function AppContent() {
           activePage={activePage}
           setActivePage={setActivePage}
         />
+        <AnimatePresence>
+          {showProfileSetup && (
+            <ProfileSetupModal onDone={() => setProfileModalDismissed(true)} />
+          )}
+        </AnimatePresence>
       </div>
     );
   }
@@ -807,6 +983,11 @@ function AppContent() {
       {activePage === "ca-quiz" && <CAQuiz />}
       {activePage === "profile" && <Profile />}
       <MobileBottomNav activePage={activePage} setActivePage={setActivePage} />
+      <AnimatePresence>
+        {showProfileSetup && (
+          <ProfileSetupModal onDone={() => setProfileModalDismissed(true)} />
+        )}
+      </AnimatePresence>
     </AppShell>
   );
 }

@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
+import { april2025Part1 } from "../data/april2025Part1";
+import { april2025QuizPart1 } from "../data/april2025QuizPart1";
 import { february2025Part1 } from "../data/february2025Part1";
 import { february2025Part2 } from "../data/february2025Part2";
 import { february2025QuizExtra } from "../data/february2025QuizExtra";
@@ -19,6 +21,10 @@ import { type DayData, january2025Part1 } from "../data/january2025Part1";
 import { january2025Part2 } from "../data/january2025Part2";
 import { january2025QuizExtra } from "../data/january2025QuizExtra";
 import { january2025QuizExtraPart2 } from "../data/january2025QuizExtraPart2";
+import { march2025Part1 } from "../data/march2025Part1";
+import { march2025Part2 } from "../data/march2025Part2";
+import { march2025QuizPart1 } from "../data/march2025QuizPart1";
+import { march2025QuizPart2 } from "../data/march2025QuizPart2";
 
 type QuizQuestion = {
   newsTitle: string;
@@ -44,7 +50,10 @@ function buildQuestions(day: DayData): QuizQuestion[] {
       january2025QuizExtra.find((e) => e.newsId === news.id) ??
       january2025QuizExtraPart2.find((e) => e.newsId === news.id) ??
       february2025QuizExtra.find((e) => e.newsId === news.id) ??
-      february2025QuizPart2.find((e) => e.newsId === news.id);
+      february2025QuizPart2.find((e) => e.newsId === news.id) ??
+      march2025QuizPart1.find((e) => e.newsId === news.id) ??
+      march2025QuizPart2.find((e) => e.newsId === news.id) ??
+      april2025QuizPart1.find((e) => e.newsId === news.id);
     if (extra) {
       questions.push({
         newsTitle: news.title,
@@ -93,6 +102,9 @@ export function CAQuiz() {
       ...january2025Part2,
       ...february2025Part1,
       ...february2025Part2,
+      ...march2025Part1,
+      ...march2025Part2,
+      ...april2025Part1,
     ]) {
       loaded[day.date] = getStoredScore(day.date);
     }
@@ -157,6 +169,9 @@ export function CAQuiz() {
             { label: "January 2025 (16–31)", days: january2025Part2 },
             { label: "February 2025 (1–15)", days: february2025Part1 },
             { label: "February 2025 (16–28)", days: february2025Part2 },
+            { label: "March 2025 (1–15)", days: march2025Part1 },
+            { label: "March 2025 (16–31)", days: march2025Part2 },
+            { label: "April 2025 (1–15)", days: april2025Part1 },
           ].map(({ label, days }) => (
             <div key={label} className="mb-6">
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">

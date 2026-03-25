@@ -26,6 +26,9 @@ export function Profile() {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [examGoal, setExamGoal] = useState(
+    () => localStorage.getItem("examGoal") ?? "TS LAWCET 2026",
+  );
   const [editing, setEditing] = useState(false);
 
   // Populate form when profile loads
@@ -45,6 +48,7 @@ export function Profile() {
       toast.error("Please enter your name.");
       return;
     }
+    localStorage.setItem("examGoal", examGoal.trim());
     saveProfile.mutate(
       { name: name.trim(), email: email.trim() },
       {
@@ -74,6 +78,8 @@ export function Profile() {
         .toUpperCase()
         .slice(0, 2)
     : "?";
+
+  const savedExamGoal = localStorage.getItem("examGoal") ?? "TS LAWCET 2026";
 
   return (
     <div className="max-w-2xl mx-auto w-full px-4 sm:px-6 py-8">
@@ -139,6 +145,7 @@ export function Profile() {
               <>
                 <Skeleton className="h-10 w-full" />
                 <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
               </>
             ) : editing ? (
               <>
@@ -163,6 +170,16 @@ export function Profile() {
                     data-ocid="profile.input"
                   />
                 </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="profile-exam-goal">Exam Goal</Label>
+                  <Input
+                    id="profile-exam-goal"
+                    value={examGoal}
+                    onChange={(e) => setExamGoal(e.target.value)}
+                    placeholder="e.g. TS LAWCET 2026"
+                    data-ocid="profile.input"
+                  />
+                </div>
                 <div className="flex gap-2">
                   <Button
                     onClick={handleSave}
@@ -179,6 +196,9 @@ export function Profile() {
                       onClick={() => {
                         setName(profile.name);
                         setEmail(profile.email);
+                        setExamGoal(
+                          localStorage.getItem("examGoal") ?? "TS LAWCET 2026",
+                        );
                         setEditing(false);
                       }}
                       className="border-border hover:border-primary/50"
@@ -208,6 +228,15 @@ export function Profile() {
                       {profile?.email || "\u2014"}
                     </p>
                   </div>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">
+                    Exam Goal
+                  </p>
+                  <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+                    <Target className="w-3.5 h-3.5 text-primary" />
+                    {savedExamGoal || "TS LAWCET 2026"}
+                  </p>
                 </div>
                 <Button
                   variant="outline"

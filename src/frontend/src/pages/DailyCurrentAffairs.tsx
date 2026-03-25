@@ -1,10 +1,13 @@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { april2025Part1 } from "@/data/april2025Part1";
 import { february2025Part1 } from "@/data/february2025Part1";
 import { february2025Part2 } from "@/data/february2025Part2";
 import { january2025Part1 } from "@/data/january2025Part1";
 import type { NewsItem as StaticNewsItem } from "@/data/january2025Part1";
 import { january2025Part2 } from "@/data/january2025Part2";
+import { march2025Part1 } from "@/data/march2025Part1";
+import { march2025Part2 } from "@/data/march2025Part2";
 import { getCategoryColor } from "@/lib/utils-ca";
 import { BookMarked, Calendar, CheckCircle2, Eye, XCircle } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -210,6 +213,9 @@ export function DailyCurrentAffairs() {
       ...january2025Part2,
       ...february2025Part1,
       ...february2025Part2,
+      ...march2025Part1,
+      ...march2025Part2,
+      ...april2025Part1,
     ];
     return allDays.find((d) => d.date === selectedDate) ?? null;
   }, [selectedDate]);
@@ -245,7 +251,7 @@ export function DailyCurrentAffairs() {
             type="date"
             value={selectedDate}
             min="2025-01-01"
-            max="2025-02-28"
+            max="2025-04-15"
             onChange={(e) => setSelectedDate(e.target.value)}
             className="bg-transparent text-sm font-medium text-foreground outline-none cursor-pointer"
             style={{ colorScheme: "dark" }}
@@ -280,8 +286,8 @@ export function DailyCurrentAffairs() {
           data-ocid="ca.no_data_state"
         >
           <p className="text-muted-foreground text-sm">
-            Content available for January 1 – February 28, 2025. Select a date
-            in that range.
+            Content available for January 1 – March 15, 2025. Select a date in
+            that range.
           </p>
           <p className="text-muted-foreground text-xs mt-1">
             More dates coming soon.
