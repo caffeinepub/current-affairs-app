@@ -7,6 +7,7 @@ import {
   signInWithEmailAndPassword,
   signInWithRedirect,
   signOut,
+  updateProfile,
 } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { auth } from "./firebase";
@@ -76,6 +77,18 @@ export function useAuth() {
   const signupWithEmail = (email: string, password: string) =>
     createUserWithEmailAndPassword(auth, email, password);
 
+  const signupWithEmailAndName = async (
+    email: string,
+    password: string,
+    name: string,
+  ) => {
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    if (cred.user && name.trim()) {
+      await updateProfile(cred.user, { displayName: name.trim() });
+    }
+    return cred;
+  };
+
   const loginWithGoogle = () =>
     signInWithRedirect(auth, new GoogleAuthProvider());
 
@@ -89,6 +102,7 @@ export function useAuth() {
     clearGoogleRedirectError: () => setGoogleRedirectError(null),
     loginWithEmail,
     signupWithEmail,
+    signupWithEmailAndName,
     loginWithGoogle,
     logout,
   };

@@ -262,6 +262,7 @@ function ProfileSetupModal({ onDone }: { onDone: () => void }) {
       { name: name.trim(), email: user?.email ?? "" },
       {
         onSuccess: () => {
+          localStorage.setItem("userName", name.trim());
           toast.success(`Welcome, ${name.trim()}! Profile saved.`);
           onDone();
         },
@@ -411,7 +412,7 @@ function Dashboard() {
   const progressPct =
     totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0;
 
-  const displayName = profile?.name || "";
+  const displayName = profile?.name || localStorage.getItem("userName") || "";
 
   function handleStartQuiz() {
     markDay.mutate(undefined, {
@@ -720,14 +721,15 @@ function GoogleIcon({ className }: { className?: string }) {
 function LoginScreen() {
   const {
     loginWithEmail,
-    signupWithEmail,
     loginWithGoogle,
+    signupWithEmailAndName,
     googleRedirectError,
     clearGoogleRedirectError,
   } = useAuth();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -743,12 +745,17 @@ function LoginScreen() {
       setError("Please enter your email and password.");
       return;
     }
+    if (mode === "signup" && !name.trim()) {
+      setError("Please enter your name.");
+      return;
+    }
     setLoading(true);
     try {
       if (mode === "signin") {
         await loginWithEmail(email, password);
       } else {
-        await signupWithEmail(email, password);
+        await signupWithEmailAndName(email, password, name.trim());
+        localStorage.setItem("userName", name.trim());
       }
     } catch (err: any) {
       setError(getFirebaseErrorMessage(err?.code ?? ""));
@@ -836,6 +843,26 @@ function LoginScreen() {
 
           {/* Email/Password form */}
           <form onSubmit={handleEmailAuth} className="flex flex-col gap-3">
+            {mode === "signup" && (
+              <div className="flex flex-col gap-1.5">
+                <label
+                  htmlFor="auth-name"
+                  className="text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >
+                  Your Name
+                </label>
+                <input
+                  id="auth-name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter your full name"
+                  autoComplete="name"
+                  className="w-full px-3 py-2.5 rounded-lg text-sm bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+                  data-ocid="login.name_input"
+                />
+              </div>
+            )}
             <div className="flex flex-col gap-1.5">
               <label
                 htmlFor="auth-email"
@@ -931,18 +958,32 @@ function LoginScreen() {
 }
 
 function AppContent() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const [activePage, setActivePage] = useState<Page>("dashboard");
   const { data: profile, isLoading: profileLoading } = useMyProfile();
-  const [profileModalDismissed, setProfileModalDismissed] = useState(false);
+  const saveProfile = useSaveProfile();
 
-  const showProfileSetup =
-    isAuthenticated &&
-    !profileLoading &&
-    !profileModalDismissed &&
-    (!profile || !profile.name || profile.name.trim() === "");
+  // Auto-save profile from Firebase displayName if backend profile is missing
+  useEffect(() => {
+    if (
+      isAuthenticated &&
+      !profileLoading &&
+      user &&
+      user.displayName &&
+      (!profile || !profile.name || profile.name.trim() === "")
+    ) {
+      const name = user.displayName.trim();
+      if (name) {
+        localStorage.setItem("userName", name);
+        saveProfile.mutate({ name, email: user.email ?? "" });
+      }
+    }
+  }, [isAuthenticated, profileLoading, user, profile, saveProfile.mutate]);
 
-  if (isLoading || (isAuthenticated && profileLoading)) {
+  // Name is collected at signup, no post-login popup needed
+  const showProfileSetup = false;
+
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div
@@ -966,9 +1007,7 @@ function AppContent() {
           setActivePage={setActivePage}
         />
         <AnimatePresence>
-          {showProfileSetup && (
-            <ProfileSetupModal onDone={() => setProfileModalDismissed(true)} />
-          )}
+          {showProfileSetup && <ProfileSetupModal onDone={() => {}} />}
         </AnimatePresence>
       </div>
     );
@@ -984,9 +1023,7 @@ function AppContent() {
       {activePage === "profile" && <Profile />}
       <MobileBottomNav activePage={activePage} setActivePage={setActivePage} />
       <AnimatePresence>
-        {showProfileSetup && (
-          <ProfileSetupModal onDone={() => setProfileModalDismissed(true)} />
-        )}
+        {showProfileSetup && <ProfileSetupModal onDone={() => {}} />}
       </AnimatePresence>
     </AppShell>
   );

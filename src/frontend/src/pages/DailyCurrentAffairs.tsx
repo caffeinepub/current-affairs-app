@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { april2025Part1 } from "@/data/april2025Part1";
+import { april2025Part2 } from "@/data/april2025Part2";
 import { february2025Part1 } from "@/data/february2025Part1";
 import { february2025Part2 } from "@/data/february2025Part2";
 import { january2025Part1 } from "@/data/january2025Part1";
@@ -216,6 +217,7 @@ export function DailyCurrentAffairs() {
       ...march2025Part1,
       ...march2025Part2,
       ...april2025Part1,
+      ...april2025Part2,
     ];
     return allDays.find((d) => d.date === selectedDate) ?? null;
   }, [selectedDate]);
@@ -251,7 +253,7 @@ export function DailyCurrentAffairs() {
             type="date"
             value={selectedDate}
             min="2025-01-01"
-            max="2025-04-15"
+            max="2025-04-30"
             onChange={(e) => setSelectedDate(e.target.value)}
             className="bg-transparent text-sm font-medium text-foreground outline-none cursor-pointer"
             style={{ colorScheme: "dark" }}
