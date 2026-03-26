@@ -332,7 +332,7 @@ function generateNewsPDF(
         3 +
         (summaryLines.length as number) * 4.5 +
         (insightLines.length > 0
-          ? 5 + (insightLines.length as number) * 4.5 + 3
+          ? (insightLines.length as number) * 4.5 + 3
           : 0) +
         5;
 
@@ -376,11 +376,6 @@ function generateNewsPDF(
 
       // Key Insight
       if (insightLines.length > 0) {
-        doc.setFontSize(7.5);
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(96, 165, 250);
-        doc.text("💡 Key Insight:", margin + 5, cy + 3);
-        cy += 5;
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         doc.setTextColor(147, 197, 253);
