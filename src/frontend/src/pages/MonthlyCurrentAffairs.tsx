@@ -8,12 +8,15 @@ import { january2025Part2 } from "@/data/january2025Part2";
 import { march2025Part1 } from "@/data/march2025Part1";
 import { march2025Part2 } from "@/data/march2025Part2";
 import { getCategoryColor } from "@/lib/utils-ca";
+import jsPDF from "jspdf";
 import {
   BookOpen,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   Download,
+  FileImage,
+  FileText,
   Star,
   Zap,
 } from "lucide-react";
@@ -137,6 +140,16 @@ const CAT_CANVAS_COLORS: Record<string, string> = {
   Sports: "#2dd4bf",
 };
 
+// PDF RGB colors per category
+const CAT_PDF_COLORS: Record<string, [number, number, number]> = {
+  National: [96, 165, 250],
+  International: [192, 132, 252],
+  Economy: [74, 222, 128],
+  Legal: [251, 191, 36],
+  Awards: [244, 114, 182],
+  Sports: [45, 212, 191],
+};
+
 function simpleHash(s: string): number {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
@@ -159,6 +172,235 @@ function displayDate(dateStr: string): string {
     month: "long",
     year: "numeric",
   });
+}
+
+// --- PDF generation ---
+
+function generateNewsPDF(
+  items: { item: NewsItem; date: string }[],
+  monthLabel: string,
+  mode: "all" | "filtered",
+): void {
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const pageW = 210;
+  const pageH = 297;
+  const margin = 15;
+  const contentW = pageW - margin * 2;
+
+  let y = margin;
+  let pageNum = 1;
+
+  function addFooter() {
+    doc.setFontSize(8);
+    doc.setTextColor(120, 120, 130);
+    doc.setFont("helvetica", "normal");
+    doc.text(`TS LAWCET Current Affairs  |  ${monthLabel}`, margin, pageH - 8);
+    doc.text(`Page ${pageNum}`, pageW - margin - 12, pageH - 8);
+  }
+
+  function checkNewPage(needed: number) {
+    if (y + needed > pageH - 20) {
+      addFooter();
+      doc.addPage();
+      pageNum++;
+      y = margin;
+    }
+  }
+
+  // --- Title page ---
+  doc.setFillColor(15, 23, 42);
+  doc.rect(0, 0, pageW, pageH, "F");
+
+  // Top accent bar gradient-like (blue)
+  doc.setFillColor(59, 130, 246);
+  doc.rect(0, 0, pageW, 3, "F");
+  doc.setFillColor(139, 92, 246);
+  doc.rect(pageW / 2, 0, pageW / 2, 3, "F");
+
+  // Decorative circle
+  doc.setFillColor(30, 58, 138);
+  doc.circle(pageW - 30, 60, 40, "F");
+  doc.setFillColor(20, 42, 100);
+  doc.circle(pageW - 30, 60, 30, "F");
+
+  // App label
+  doc.setTextColor(96, 165, 250);
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.text("TS LAWCET", margin, 50);
+
+  doc.setTextColor(148, 163, 184);
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
+  doc.text("Current Affairs", margin, 57);
+
+  // Month title
+  doc.setTextColor(241, 245, 249);
+  doc.setFontSize(30);
+  doc.setFont("helvetica", "bold");
+  doc.text(monthLabel, margin, 78);
+
+  // Divider line
+  doc.setDrawColor(59, 130, 246);
+  doc.setLineWidth(0.5);
+  doc.line(margin, 84, margin + 60, 84);
+
+  // Subtitle
+  doc.setTextColor(148, 163, 184);
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  const modeLabel =
+    mode === "all" ? "Complete Edition" : "Quick Revision — Filtered";
+  doc.text(`${items.length} news items  ·  ${modeLabel}`, margin, 92);
+
+  // Date generated
+  doc.setFontSize(8);
+  doc.setTextColor(100, 116, 139);
+  doc.text(
+    `Generated: ${new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}`,
+    margin,
+    100,
+  );
+
+  // Category legend
+  let lx = margin;
+  const ly = 116;
+  doc.setFontSize(7);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(100, 116, 139);
+  doc.text("CATEGORIES:", margin, ly - 5);
+  for (const cat of CATEGORY_LIST) {
+    const rgb = CAT_PDF_COLORS[cat] ?? [148, 163, 184];
+    doc.setFillColor(...rgb);
+    doc.circle(lx + 2, ly + 1, 2, "F");
+    doc.setTextColor(...rgb);
+    doc.text(cat, lx + 6, ly + 3);
+    lx += doc.getTextWidth(cat) + 14;
+    if (lx > pageW - margin - 20) {
+      lx = margin;
+    }
+  }
+
+  addFooter();
+  doc.addPage();
+  pageNum++;
+  y = margin;
+
+  // --- Content pages ---
+  // Group by date
+  const dateGroups = new Map<string, { item: NewsItem; date: string }[]>();
+  for (const entry of items) {
+    const g = dateGroups.get(entry.date) ?? [];
+    g.push(entry);
+    dateGroups.set(entry.date, g);
+  }
+
+  for (const [date, groupItems] of dateGroups) {
+    checkNewPage(22);
+
+    // Date header bar
+    doc.setFillColor(30, 58, 138);
+    doc.roundedRect(margin, y, contentW, 10, 2, 2, "F");
+    doc.setFillColor(59, 130, 246);
+    doc.rect(margin, y, 3, 10, "F");
+    doc.setTextColor(219, 234, 254);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    const [yr, mo, dy] = date.split("-").map(Number);
+    const dateLabel = new Date(yr, mo - 1, dy).toLocaleDateString("en-IN", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    doc.text(dateLabel, margin + 6, y + 7);
+    y += 14;
+
+    for (const { item } of groupItems) {
+      const catRgb = CAT_PDF_COLORS[item.category] ?? [148, 163, 184];
+      const titleLines = doc.splitTextToSize(item.title, contentW - 8);
+      const summaryLines = doc.splitTextToSize(item.summary, contentW - 6);
+      const insightText = item.mcq?.explanation ?? "";
+      const insightLines = insightText
+        ? doc.splitTextToSize(insightText, contentW - 10)
+        : [];
+
+      const cardH =
+        6 +
+        5 +
+        (titleLines.length as number) * 5.5 +
+        3 +
+        (summaryLines.length as number) * 4.5 +
+        (insightLines.length > 0
+          ? 5 + (insightLines.length as number) * 4.5 + 3
+          : 0) +
+        5;
+
+      checkNewPage(cardH + 5);
+
+      // Card background
+      doc.setFillColor(22, 32, 50);
+      doc.roundedRect(margin, y, contentW, cardH, 2, 2, "F");
+
+      // Left color accent
+      doc.setFillColor(...catRgb);
+      doc.rect(margin, y, 2.5, cardH, "F");
+
+      // Subtle border
+      doc.setDrawColor(40, 55, 80);
+      doc.setLineWidth(0.2);
+      doc.roundedRect(margin, y, contentW, cardH, 2, 2, "S");
+
+      let cy = y + 5;
+
+      // Category label
+      doc.setFontSize(7);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(...catRgb);
+      doc.text(item.category.toUpperCase(), margin + 6, cy);
+      cy += 5;
+
+      // Title
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(241, 245, 249);
+      doc.text(titleLines, margin + 5, cy);
+      cy += (titleLines.length as number) * 5.5 + 3;
+
+      // Summary
+      doc.setFontSize(8.5);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(148, 163, 184);
+      doc.text(summaryLines, margin + 5, cy);
+      cy += (summaryLines.length as number) * 4.5 + 2;
+
+      // Key Insight
+      if (insightLines.length > 0) {
+        doc.setFontSize(7.5);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(96, 165, 250);
+        doc.text("💡 Key Insight:", margin + 5, cy + 3);
+        cy += 5;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(147, 197, 253);
+        doc.text(insightLines, margin + 5, cy);
+      }
+
+      y += cardH + 4;
+    }
+
+    y += 4;
+  }
+
+  addFooter();
+
+  const safeLabel = monthLabel.replace(/\s+/g, "-");
+  doc.save(
+    `TSLAWCET-${safeLabel}-CurrentAffairs${
+      mode === "filtered" ? "-Filtered" : ""
+    }.pdf`,
+  );
 }
 
 // --- Canvas image generation ---
@@ -222,65 +464,45 @@ function generateNewsImage(
   monthLabel: string,
   mode: "all" | "filtered",
 ): void {
-  const CANVAS_W = 800;
-  const PAD = 32;
-  const INNER_W = CANVAS_W - PAD * 2;
-  const CARD_PAD = 20;
+  const PAGE_W = 720;
+  const PAGE_H = 1080;
+  const PAD = 28;
+  const INNER_W = PAGE_W - PAD * 2;
+  const CARD_PAD = 18;
   const CARD_INNER = INNER_W - CARD_PAD * 2;
 
-  // First pass: measure total height needed
   const measureCanvas = document.createElement("canvas");
-  measureCanvas.width = CANVAS_W;
+  measureCanvas.width = PAGE_W;
   const mCtx = measureCanvas.getContext("2d")!;
 
   function measureCardHeight(entry: { item: NewsItem; date: string }): number {
-    let h = CARD_PAD; // top pad
-
-    // category badge row ~20px
+    let h = CARD_PAD;
     h += 24;
     h += 8;
-
-    // Title
-    mCtx.font = "bold 15px system-ui, sans-serif";
-    h += measureWrappedHeight(mCtx, entry.item.title, CARD_INNER - 10, 22);
+    mCtx.font = "bold 14px system-ui, sans-serif";
+    h += measureWrappedHeight(mCtx, entry.item.title, CARD_INNER - 10, 21);
     h += 10;
-
-    // Summary
-    mCtx.font = "13px system-ui, sans-serif";
-    h += measureWrappedHeight(mCtx, entry.item.summary, CARD_INNER, 19);
+    mCtx.font = "12px system-ui, sans-serif";
+    h += measureWrappedHeight(mCtx, entry.item.summary, CARD_INNER, 18);
     h += 10;
-
-    // Key insight
     if (entry.item.mcq?.explanation) {
-      h += 8; // label
+      h += 8;
       h += 16;
-      mCtx.font = "12px system-ui, sans-serif";
+      mCtx.font = "11px system-ui, sans-serif";
       h += measureWrappedHeight(
         mCtx,
         entry.item.mcq.explanation,
-        CARD_INNER - 24,
-        18,
+        CARD_INNER - 20,
+        17,
       );
       h += 12;
     }
-
-    // Tags row
-    const imp = isImportant(entry.item);
-    const exam = isExamLikely(entry.item);
-    if (imp || exam) h += 28;
-
-    h += CARD_PAD; // bottom pad
+    if (isImportant(entry.item) || isExamLikely(entry.item)) h += 28;
+    h += CARD_PAD;
     return h;
   }
 
-  // Calculate total canvas height
-  let totalH = 0;
-  totalH += 90; // header
-  totalH += 16; // gap
-  totalH += 28; // mode subtitle
-  totalH += 16; // gap
-
-  // Group by date for header labels
+  // Group by date
   const dateGroups: Map<string, { item: NewsItem; date: string }[]> = new Map();
   for (const entry of items) {
     const group = dateGroups.get(entry.date) ?? [];
@@ -288,255 +510,273 @@ function generateNewsImage(
     dateGroups.set(entry.date, group);
   }
 
-  for (const [, groupItems] of dateGroups) {
-    totalH += 36; // date group header
-    totalH += 8;
-    for (const entry of groupItems) {
-      totalH += measureCardHeight(entry) + 10;
-    }
-    totalH += 8;
-  }
+  // Build pages: split content into PAGE_H-tall chunks
+  type PageEntry =
+    | { type: "header"; monthLabel: string; mode: string; count: number }
+    | { type: "dateGroup"; date: string }
+    | {
+        type: "newsCard";
+        entry: { item: NewsItem; date: string };
+        cardH: number;
+      };
 
-  totalH += 60; // footer
-
-  // Now draw on real canvas
-  const canvas = document.createElement("canvas");
-  canvas.width = CANVAS_W;
-  canvas.height = totalH;
-  const ctx = canvas.getContext("2d")!;
-
-  // Background
-  ctx.fillStyle = "#0f172a";
-  ctx.fillRect(0, 0, CANVAS_W, totalH);
-
-  // Subtle grid pattern
-  ctx.strokeStyle = "rgba(255,255,255,0.02)";
-  ctx.lineWidth = 1;
-  for (let x = 0; x < CANVAS_W; x += 40) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, totalH);
-    ctx.stroke();
-  }
-
-  let y = 0;
-
-  // --- HEADER ---
-  // Top accent bar
-  const grad = ctx.createLinearGradient(0, 0, CANVAS_W, 0);
-  grad.addColorStop(0, "#3b82f6");
-  grad.addColorStop(1, "#8b5cf6");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, CANVAS_W, 4);
-
-  y = 18;
-  // App name
-  ctx.fillStyle = "#60a5fa";
-  ctx.font = "bold 13px system-ui, sans-serif";
-  ctx.fillText("TS LAWCET Current Affairs", PAD, y + 13);
-
-  y += 24;
-  ctx.fillStyle = "#f8fafc";
-  ctx.font = "bold 26px system-ui, sans-serif";
-  ctx.fillText(monthLabel, PAD, y + 26);
-
-  y += 44;
-  // Divider
-  ctx.strokeStyle = "rgba(255,255,255,0.08)";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(PAD, y);
-  ctx.lineTo(CANVAS_W - PAD, y);
-  ctx.stroke();
-  y += 16;
-
-  // Mode subtitle
-  ctx.fillStyle = "#94a3b8";
-  ctx.font = "13px system-ui, sans-serif";
-  const modeLabel =
-    mode === "all"
-      ? `All news · ${items.length} items`
-      : `Quick Revision / Filtered · ${items.length} items`;
-  ctx.fillText(modeLabel, PAD, y + 13);
-  y += 28 + 16;
-
-  // --- DATE GROUPS ---
+  const allEntries: PageEntry[] = [
+    { type: "header", monthLabel, mode, count: items.length },
+  ];
   for (const [date, groupItems] of dateGroups) {
-    // Date header
-    ctx.fillStyle = "rgba(59,130,246,0.1)";
-    drawRoundedRect(ctx, PAD, y, INNER_W, 30, 8);
-    ctx.fill();
-
-    // Left accent
-    ctx.fillStyle = "#3b82f6";
-    drawRoundedRect(ctx, PAD, y, 4, 30, 2);
-    ctx.fill();
-
-    ctx.fillStyle = "#e2e8f0";
-    ctx.font = "bold 13px system-ui, sans-serif";
-    ctx.fillText(displayDate(date), PAD + 14, y + 20);
-    y += 36 + 8;
-
+    allEntries.push({ type: "dateGroup", date });
     for (const entry of groupItems) {
       const cardH = measureCardHeight(entry);
-      const { item } = entry;
-      const imp = isImportant(item);
-      const exam = isExamLikely(item);
-      const catColor = CAT_CANVAS_COLORS[item.category] ?? "#94a3b8";
-
-      // Card background
-      ctx.fillStyle = "rgba(30,41,59,0.9)";
-      drawRoundedRect(ctx, PAD, y, INNER_W, cardH, 10);
-      ctx.fill();
-
-      // Card left border accent
-      ctx.fillStyle = catColor;
-      drawRoundedRect(ctx, PAD, y, 3, cardH, 2);
-      ctx.fill();
-
-      let cy = y + CARD_PAD;
-
-      // Category badge
-      ctx.font = "bold 11px system-ui, sans-serif";
-      const badgeText = item.category;
-      const badgeW = ctx.measureText(badgeText).width + 16;
-      ctx.fillStyle = `${catColor}22`;
-      drawRoundedRect(ctx, PAD + CARD_PAD, cy, badgeW, 20, 10);
-      ctx.fill();
-      ctx.strokeStyle = `${catColor}55`;
-      ctx.lineWidth = 1;
-      drawRoundedRect(ctx, PAD + CARD_PAD, cy, badgeW, 20, 10);
-      ctx.stroke();
-      ctx.fillStyle = catColor;
-      ctx.fillText(badgeText, PAD + CARD_PAD + 8, cy + 14);
-      cy += 24 + 8;
-
-      // Title
-      ctx.font = "bold 15px system-ui, sans-serif";
-      ctx.fillStyle = "#f1f5f9";
-      const titleLines = wrapText(ctx, item.title, 0, CARD_INNER - 10, 22);
-      for (const line of titleLines) {
-        ctx.fillText(line, PAD + CARD_PAD, cy + 15);
-        cy += 22;
-      }
-      cy += 10;
-
-      // Summary
-      ctx.font = "13px system-ui, sans-serif";
-      ctx.fillStyle = "#94a3b8";
-      const summaryLines = wrapText(ctx, item.summary, 0, CARD_INNER, 19);
-      for (const line of summaryLines) {
-        ctx.fillText(line, PAD + CARD_PAD, cy + 13);
-        cy += 19;
-      }
-      cy += 10;
-
-      // Key insight
-      if (item.mcq?.explanation) {
-        const insightInner = CARD_INNER - 24;
-        ctx.font = "12px system-ui, sans-serif";
-        const insightLines = wrapText(
-          ctx,
-          item.mcq.explanation,
-          0,
-          insightInner,
-          18,
-        );
-        const insightBlockH = insightLines.length * 18 + 32;
-        ctx.fillStyle = "rgba(59,130,246,0.08)";
-        drawRoundedRect(ctx, PAD + CARD_PAD, cy, CARD_INNER, insightBlockH, 8);
-        ctx.fill();
-        ctx.strokeStyle = "rgba(59,130,246,0.3)";
-        ctx.lineWidth = 1;
-        drawRoundedRect(ctx, PAD + CARD_PAD, cy, CARD_INNER, insightBlockH, 8);
-        ctx.stroke();
-
-        ctx.fillStyle = "#60a5fa";
-        ctx.font = "bold 11px system-ui, sans-serif";
-        ctx.fillText("💡 Key Insight", PAD + CARD_PAD + 10, cy + 16);
-
-        ctx.fillStyle = "#93c5fd";
-        ctx.font = "12px system-ui, sans-serif";
-        let iy = cy + 30;
-        for (const line of insightLines) {
-          ctx.fillText(line, PAD + CARD_PAD + 10, iy);
-          iy += 18;
-        }
-        cy += insightBlockH + 12;
-      }
-
-      // Tags
-      if (imp || exam) {
-        let tx = PAD + CARD_PAD;
-        const tagY = cy + 4;
-        if (imp) {
-          ctx.font = "bold 11px system-ui, sans-serif";
-          const tw = ctx.measureText("⭐ Most Important").width + 14;
-          ctx.fillStyle = "rgba(251,191,36,0.1)";
-          drawRoundedRect(ctx, tx, tagY, tw, 20, 10);
-          ctx.fill();
-          ctx.strokeStyle = "rgba(251,191,36,0.4)";
-          ctx.lineWidth = 1;
-          drawRoundedRect(ctx, tx, tagY, tw, 20, 10);
-          ctx.stroke();
-          ctx.fillStyle = "#fbbf24";
-          ctx.fillText("⭐ Most Important", tx + 7, tagY + 14);
-          tx += tw + 8;
-        }
-        if (exam) {
-          ctx.font = "bold 11px system-ui, sans-serif";
-          const tw = ctx.measureText("📘 Exam Likely").width + 14;
-          ctx.fillStyle = "rgba(96,165,250,0.1)";
-          drawRoundedRect(ctx, tx, tagY, tw, 20, 10);
-          ctx.fill();
-          ctx.strokeStyle = "rgba(96,165,250,0.4)";
-          ctx.lineWidth = 1;
-          drawRoundedRect(ctx, tx, tagY, tw, 20, 10);
-          ctx.stroke();
-          ctx.fillStyle = "#60a5fa";
-          ctx.fillText("📘 Exam Likely", tx + 7, tagY + 14);
-        }
-        cy += 28;
-      }
-
-      y += cardH + 10;
+      allEntries.push({ type: "newsCard", entry, cardH });
     }
-    y += 8;
   }
 
-  // --- FOOTER ---
-  ctx.strokeStyle = "rgba(255,255,255,0.08)";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(PAD, y);
-  ctx.lineTo(CANVAS_W - PAD, y);
-  ctx.stroke();
-  y += 14;
+  // Assign entries to pages
+  const pages: PageEntry[][] = [];
+  let currentPage: PageEntry[] = [];
+  let currentY = 0;
 
-  ctx.fillStyle = "#475569";
-  ctx.font = "12px system-ui, sans-serif";
-  const footerText = `TS LAWCET Current Affairs  |  ${monthLabel}`;
-  const ftW = ctx.measureText(footerText).width;
-  ctx.fillText(footerText, (CANVAS_W - ftW) / 2, y + 12);
+  for (const entry of allEntries) {
+    let entryH = 0;
+    if (entry.type === "header") entryH = 120;
+    else if (entry.type === "dateGroup") entryH = 44;
+    else entryH = entry.cardH + 10;
 
-  // Save
-  const link = document.createElement("a");
-  const safeLabel = monthLabel.replace(/\s+/g, "-");
-  link.download = `TSLAWCET-${safeLabel}-CurrentAffairs${mode === "filtered" ? "-Filtered" : ""}.png`;
-  link.href = canvas.toDataURL("image/png");
-  link.click();
+    if (currentY + entryH > PAGE_H - 30 && currentPage.length > 0) {
+      pages.push(currentPage);
+      currentPage = [];
+      currentY = 0;
+    }
+    currentPage.push(entry);
+    currentY += entryH;
+  }
+  if (currentPage.length > 0) pages.push(currentPage);
+
+  // Draw each page and trigger download
+  pages.forEach((pageEntries, pageIndex) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = PAGE_W;
+    canvas.height = PAGE_H;
+    const ctx = canvas.getContext("2d")!;
+
+    // Background
+    ctx.fillStyle = "#0f172a";
+    ctx.fillRect(0, 0, PAGE_W, PAGE_H);
+
+    // Subtle grid
+    ctx.strokeStyle = "rgba(255,255,255,0.02)";
+    ctx.lineWidth = 1;
+    for (let x = 0; x < PAGE_W; x += 36) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, PAGE_H);
+      ctx.stroke();
+    }
+
+    // Top accent bar
+    const grad = ctx.createLinearGradient(0, 0, PAGE_W, 0);
+    grad.addColorStop(0, "#3b82f6");
+    grad.addColorStop(1, "#8b5cf6");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, PAGE_W, 3);
+
+    let y = 12;
+
+    for (const entry of pageEntries) {
+      if (entry.type === "header") {
+        ctx.fillStyle = "#60a5fa";
+        ctx.font = "bold 12px system-ui, sans-serif";
+        ctx.fillText("TS LAWCET Current Affairs", PAD, y + 12);
+        y += 22;
+
+        ctx.fillStyle = "#f8fafc";
+        ctx.font = "bold 24px system-ui, sans-serif";
+        ctx.fillText(monthLabel, PAD, y + 24);
+        y += 36;
+
+        ctx.strokeStyle = "rgba(255,255,255,0.08)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(PAD, y);
+        ctx.lineTo(PAGE_W - PAD, y);
+        ctx.stroke();
+        y += 12;
+
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "12px system-ui, sans-serif";
+        const mLabel =
+          mode === "all"
+            ? `All news · ${entry.count} items`
+            : `Quick Revision · ${entry.count} items`;
+        ctx.fillText(mLabel, PAD, y + 12);
+        y += 22;
+      } else if (entry.type === "dateGroup") {
+        ctx.fillStyle = "rgba(59,130,246,0.1)";
+        drawRoundedRect(ctx, PAD, y, INNER_W, 28, 6);
+        ctx.fill();
+        ctx.fillStyle = "#3b82f6";
+        drawRoundedRect(ctx, PAD, y, 3, 28, 2);
+        ctx.fill();
+        ctx.fillStyle = "#e2e8f0";
+        ctx.font = "bold 12px system-ui, sans-serif";
+        ctx.fillText(displayDate(entry.date), PAD + 12, y + 18);
+        y += 36;
+      } else {
+        const { entry: e, cardH } = entry;
+        const { item } = e;
+        const imp = isImportant(item);
+        const exam = isExamLikely(item);
+        const catColor = CAT_CANVAS_COLORS[item.category] ?? "#94a3b8";
+
+        ctx.fillStyle = "rgba(30,41,59,0.9)";
+        drawRoundedRect(ctx, PAD, y, INNER_W, cardH, 8);
+        ctx.fill();
+
+        ctx.fillStyle = catColor;
+        drawRoundedRect(ctx, PAD, y, 3, cardH, 2);
+        ctx.fill();
+
+        let cy = y + CARD_PAD;
+
+        // Category badge
+        ctx.font = "bold 10px system-ui, sans-serif";
+        const badgeText = item.category;
+        const badgeW = ctx.measureText(badgeText).width + 14;
+        ctx.fillStyle = `${catColor}22`;
+        drawRoundedRect(ctx, PAD + CARD_PAD, cy, badgeW, 18, 9);
+        ctx.fill();
+        ctx.strokeStyle = `${catColor}55`;
+        ctx.lineWidth = 1;
+        drawRoundedRect(ctx, PAD + CARD_PAD, cy, badgeW, 18, 9);
+        ctx.stroke();
+        ctx.fillStyle = catColor;
+        ctx.fillText(badgeText, PAD + CARD_PAD + 7, cy + 12);
+        cy += 24 + 8;
+
+        ctx.font = "bold 14px system-ui, sans-serif";
+        ctx.fillStyle = "#f1f5f9";
+        const titleLines = wrapText(ctx, item.title, 0, CARD_INNER - 10, 21);
+        for (const line of titleLines) {
+          ctx.fillText(line, PAD + CARD_PAD, cy + 14);
+          cy += 21;
+        }
+        cy += 10;
+
+        ctx.font = "12px system-ui, sans-serif";
+        ctx.fillStyle = "#94a3b8";
+        const summaryLines = wrapText(ctx, item.summary, 0, CARD_INNER, 18);
+        for (const line of summaryLines) {
+          ctx.fillText(line, PAD + CARD_PAD, cy + 12);
+          cy += 18;
+        }
+        cy += 10;
+
+        if (item.mcq?.explanation) {
+          const insightInner = CARD_INNER - 20;
+          ctx.font = "11px system-ui, sans-serif";
+          const insightLines = wrapText(
+            ctx,
+            item.mcq.explanation,
+            0,
+            insightInner,
+            17,
+          );
+          const ibH = insightLines.length * 17 + 28;
+          ctx.fillStyle = "rgba(59,130,246,0.08)";
+          drawRoundedRect(ctx, PAD + CARD_PAD, cy, CARD_INNER, ibH, 6);
+          ctx.fill();
+          ctx.strokeStyle = "rgba(59,130,246,0.3)";
+          ctx.lineWidth = 1;
+          drawRoundedRect(ctx, PAD + CARD_PAD, cy, CARD_INNER, ibH, 6);
+          ctx.stroke();
+          ctx.fillStyle = "#60a5fa";
+          ctx.font = "bold 10px system-ui, sans-serif";
+          ctx.fillText("💡 Key Insight", PAD + CARD_PAD + 8, cy + 14);
+          ctx.fillStyle = "#93c5fd";
+          ctx.font = "11px system-ui, sans-serif";
+          let iy = cy + 26;
+          for (const line of insightLines) {
+            ctx.fillText(line, PAD + CARD_PAD + 8, iy);
+            iy += 17;
+          }
+          cy += ibH + 10;
+        }
+
+        if (imp || exam) {
+          let tx = PAD + CARD_PAD;
+          const tagY = cy + 4;
+          if (imp) {
+            ctx.font = "bold 10px system-ui, sans-serif";
+            const tw = ctx.measureText("⭐ Most Important").width + 12;
+            ctx.fillStyle = "rgba(251,191,36,0.1)";
+            drawRoundedRect(ctx, tx, tagY, tw, 18, 9);
+            ctx.fill();
+            ctx.strokeStyle = "rgba(251,191,36,0.4)";
+            ctx.lineWidth = 1;
+            drawRoundedRect(ctx, tx, tagY, tw, 18, 9);
+            ctx.stroke();
+            ctx.fillStyle = "#fbbf24";
+            ctx.fillText("⭐ Most Important", tx + 6, tagY + 12);
+            tx += tw + 8;
+          }
+          if (exam) {
+            ctx.font = "bold 10px system-ui, sans-serif";
+            const tw = ctx.measureText("📘 Exam Likely").width + 12;
+            ctx.fillStyle = "rgba(96,165,250,0.1)";
+            drawRoundedRect(ctx, tx, tagY, tw, 18, 9);
+            ctx.fill();
+            ctx.strokeStyle = "rgba(96,165,250,0.4)";
+            ctx.lineWidth = 1;
+            drawRoundedRect(ctx, tx, tagY, tw, 18, 9);
+            ctx.stroke();
+            ctx.fillStyle = "#60a5fa";
+            ctx.fillText("📘 Exam Likely", tx + 6, tagY + 12);
+          }
+        }
+
+        y += cardH + 10;
+      }
+    }
+
+    // Footer
+    ctx.strokeStyle = "rgba(255,255,255,0.06)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(PAD, PAGE_H - 22);
+    ctx.lineTo(PAGE_W - PAD, PAGE_H - 22);
+    ctx.stroke();
+    ctx.fillStyle = "#475569";
+    ctx.font = "10px system-ui, sans-serif";
+    ctx.fillText(`TS LAWCET  |  ${monthLabel}`, PAD, PAGE_H - 10);
+    ctx.fillText(
+      `Page ${pageIndex + 1} of ${pages.length}`,
+      PAGE_W - PAD - 80,
+      PAGE_H - 10,
+    );
+
+    const link = document.createElement("a");
+    const safeLabel = monthLabel.replace(/\s+/g, "-");
+    const suffix = mode === "filtered" ? "-Filtered" : "";
+    link.download = `TSLAWCET-${safeLabel}${suffix}-Page${pageIndex + 1}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  });
 }
 
 // --- Download Dropdown ---
 
 type DownloadDropdownProps = {
-  onDownloadAll: () => void;
-  onDownloadFiltered: () => void;
+  onDownloadAllPDF: () => void;
+  onDownloadFilteredPDF: () => void;
+  onDownloadAllImage: () => void;
+  onDownloadFilteredImage: () => void;
 };
 
 function DownloadDropdown({
-  onDownloadAll,
-  onDownloadFiltered,
+  onDownloadAllPDF,
+  onDownloadFilteredPDF,
+  onDownloadAllImage,
+  onDownloadFilteredImage,
 }: DownloadDropdownProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -576,16 +816,63 @@ function DownloadDropdown({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-1.5 bg-card border border-border rounded-xl shadow-xl overflow-hidden z-50 min-w-[180px]"
+            className="absolute right-0 top-full mt-1.5 bg-card border border-border rounded-xl shadow-xl overflow-hidden z-50 min-w-[210px]"
           >
+            {/* PDF Section */}
+            <div className="px-3 pt-2.5 pb-1">
+              <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                <FileText className="w-3 h-3" />
+                PDF
+              </div>
+            </div>
             <button
               type="button"
               onClick={() => {
                 setOpen(false);
-                onDownloadAll();
+                onDownloadAllPDF();
               }}
-              className="w-full text-left px-4 py-2.5 text-xs text-foreground hover:bg-muted/20 transition-colors flex items-center gap-2"
-              data-ocid="monthly_ca.download_all_button"
+              className="w-full text-left px-4 py-2 text-xs text-foreground hover:bg-muted/20 transition-colors flex items-center gap-2"
+              data-ocid="monthly_ca.download_all_pdf_button"
+            >
+              <Download className="w-3.5 h-3.5 text-muted-foreground" />
+              Download All
+              <span className="text-[10px] text-muted-foreground ml-auto">
+                .pdf
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                onDownloadFilteredPDF();
+              }}
+              className="w-full text-left px-4 py-2 text-xs text-foreground hover:bg-muted/20 transition-colors flex items-center gap-2"
+              data-ocid="monthly_ca.download_filtered_pdf_button"
+            >
+              <Download className="w-3.5 h-3.5 text-muted-foreground" />
+              Download Filtered
+              <span className="text-[10px] text-muted-foreground ml-auto">
+                .pdf
+              </span>
+            </button>
+
+            <div className="border-t border-border my-1" />
+
+            {/* Image Section */}
+            <div className="px-3 pt-1 pb-1">
+              <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                <FileImage className="w-3 h-3" />
+                Image
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                onDownloadAllImage();
+              }}
+              className="w-full text-left px-4 py-2 text-xs text-foreground hover:bg-muted/20 transition-colors flex items-center gap-2"
+              data-ocid="monthly_ca.download_all_image_button"
             >
               <Download className="w-3.5 h-3.5 text-muted-foreground" />
               Download All
@@ -593,15 +880,14 @@ function DownloadDropdown({
                 .png
               </span>
             </button>
-            <div className="border-t border-border" />
             <button
               type="button"
               onClick={() => {
                 setOpen(false);
-                onDownloadFiltered();
+                onDownloadFilteredImage();
               }}
-              className="w-full text-left px-4 py-2.5 text-xs text-foreground hover:bg-muted/20 transition-colors flex items-center gap-2"
-              data-ocid="monthly_ca.download_filtered_button"
+              className="w-full text-left px-4 py-2 pb-2.5 text-xs text-foreground hover:bg-muted/20 transition-colors flex items-center gap-2"
+              data-ocid="monthly_ca.download_filtered_image_button"
             >
               <Download className="w-3.5 h-3.5 text-muted-foreground" />
               Download Filtered
@@ -787,7 +1073,6 @@ export function MonthlyCurrentAffairs() {
     return withDates;
   }, [currentMonth, categoryFilter]);
 
-  // All news for current month (unfiltered) as {item, date}[]
   const allMonthNewsWithDates = useMemo(() => {
     if (!currentMonth) return [];
     const { year, month } = currentMonth;
@@ -804,7 +1089,6 @@ export function MonthlyCurrentAffairs() {
     return withDates;
   }, [currentMonth]);
 
-  // Quick revision filtered news
   const quickRevisionNews = useMemo(() => {
     return sortedFilteredNews.filter(
       ({ item }) => isImportant(item) || isExamLikely(item),
@@ -844,13 +1128,19 @@ export function MonthlyCurrentAffairs() {
   const canPrev = monthIdx > 0;
   const canNext = monthIdx < AVAILABLE_MONTHS.length - 1;
 
-  const handleDownloadAll = () => {
-    generateNewsImage(allMonthNewsWithDates, currentMonth?.label ?? "", "all");
-  };
+  const label = currentMonth?.label ?? "";
 
-  const handleDownloadFiltered = () => {
+  const handleDownloadAllPDF = () =>
+    generateNewsPDF(allMonthNewsWithDates, label, "all");
+  const handleDownloadFilteredPDF = () => {
     const items = quickMode ? quickRevisionNews : sortedFilteredNews;
-    generateNewsImage(items, currentMonth?.label ?? "", "filtered");
+    generateNewsPDF(items, label, "filtered");
+  };
+  const handleDownloadAllImage = () =>
+    generateNewsImage(allMonthNewsWithDates, label, "all");
+  const handleDownloadFilteredImage = () => {
+    const items = quickMode ? quickRevisionNews : sortedFilteredNews;
+    generateNewsImage(items, label, "filtered");
   };
 
   return (
@@ -890,8 +1180,10 @@ export function MonthlyCurrentAffairs() {
             Quick Revision
           </button>
           <DownloadDropdown
-            onDownloadAll={handleDownloadAll}
-            onDownloadFiltered={handleDownloadFiltered}
+            onDownloadAllPDF={handleDownloadAllPDF}
+            onDownloadFilteredPDF={handleDownloadFilteredPDF}
+            onDownloadAllImage={handleDownloadAllImage}
+            onDownloadFilteredImage={handleDownloadFilteredImage}
           />
         </div>
       </motion.div>
@@ -1080,7 +1372,6 @@ export function MonthlyCurrentAffairs() {
         <div>
           {groupedNews.map((dayGroup) => {
             const isDayOpen = expandedDays.has(dayGroup.date);
-            // In quick mode, only show days that have matching items
             const displayItems = quickMode
               ? dayGroup.items.filter(
                   ({ item }) => isImportant(item) || isExamLikely(item),
