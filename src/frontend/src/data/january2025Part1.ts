@@ -9,7 +9,13 @@ export type NewsItem = {
   id: string;
   title: string;
   summary: string;
-  category: "Legal" | "National" | "International" | "Awards" | "Sports";
+  category:
+    | "Legal"
+    | "National"
+    | "International"
+    | "Economy"
+    | "Awards"
+    | "Sports";
   mcq: MCQ;
 };
 
@@ -82,7 +88,7 @@ export const january2025Part1: DayData[] = [
         title: "India Begins Year as Fastest Growing Major Economy: IMF",
         summary:
           "The International Monetary Fund reaffirmed India as the fastest growing major economy entering 2025, projecting GDP growth of 6.5% for FY2025-26. India's growth outpaces China's projected 4.5% growth for the same period.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "What GDP growth rate did IMF project for India for FY2025-26?",
@@ -276,7 +282,7 @@ export const january2025Part1: DayData[] = [
         title: "India Surpasses Japan to Become World's 4th Largest Economy",
         summary:
           "According to IMF data released in early 2025, India overtook Japan to become the world's fourth largest economy by nominal GDP. India's GDP reached approximately $3.9 trillion, positioning it behind only the USA, China, and Germany.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "India became the world's _____ largest economy by nominal GDP in 2025.",
@@ -331,7 +337,7 @@ export const january2025Part1: DayData[] = [
         title: "India's Foreign Exchange Reserves Decline to $625 Billion",
         summary:
           "India's foreign exchange reserves fell by $5.7 billion to $625 billion in the week ending December 27, 2024. The decline was attributed to revaluation of assets and RBI's intervention in the forex market to stabilise the Indian rupee.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question: "India's foreign exchange reserves are managed by:",
           options: [
@@ -434,7 +440,7 @@ export const january2025Part1: DayData[] = [
         title: "India's Manufacturing PMI Rises to 57.7 in December 2024",
         summary:
           "India's Manufacturing Purchasing Managers' Index (PMI) rose to 57.7 in December 2024 from 56.5 in November, indicating robust expansion. Any reading above 50 signals expansion, with the latest figure being the highest in 16 years.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question: "A PMI reading above 50 indicates:",
           options: ["Contraction", "No change", "Expansion", "Recession"],

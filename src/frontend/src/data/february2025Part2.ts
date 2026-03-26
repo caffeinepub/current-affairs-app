@@ -500,7 +500,7 @@ export const february2025Part2: DayData[] = [
         title: "India's CPI Inflation Eases to 4.26% in January 2025",
         summary:
           "India's Consumer Price Index (CPI) inflation declined to 4.26% in January 2025 from 5.22% in December 2024, primarily due to softening vegetable prices. The fall brought inflation within the RBI's 2-6% target band after several months.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question: "India's CPI inflation in January 2025 was:",
           options: ["3.95%", "4.26%", "4.87%", "5.22%"],
@@ -683,7 +683,7 @@ export const february2025Part2: DayData[] = [
         title: "India's GDP Growth Forecast Revised to 6.8% for FY26 by IMF",
         summary:
           "The International Monetary Fund (IMF) revised India's GDP growth forecast for FY 2025-26 upward to 6.8%, citing strong domestic consumption, robust services exports, and infrastructure investment under PM Gati Shakti.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "IMF's revised GDP growth forecast for India in FY 2025-26 is:",
@@ -870,7 +870,7 @@ export const february2025Part2: DayData[] = [
         title: "India's Foreign Exchange Reserves Rise to $637 Billion",
         summary:
           "India's foreign exchange reserves rose by $1.8 billion to $637 billion as of February 21, 2025, according to RBI data. The increase was driven by rising gold reserves and foreign currency assets, strengthening India's macroeconomic buffer.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "India's foreign exchange reserves as of February 21, 2025 stood at approximately:",

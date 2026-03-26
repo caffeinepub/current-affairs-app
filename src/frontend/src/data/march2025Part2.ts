@@ -130,7 +130,7 @@ export const march2025Part2: DayData[] = [
         title: "India Signs Trade Deal with Gulf Cooperation Council",
         summary:
           "India and the Gulf Cooperation Council (GCC) signed a comprehensive Free Trade Agreement (FTA), covering goods, services, and investments. The GCC includes Saudi Arabia, UAE, Qatar, Kuwait, Bahrain, and Oman. The deal is expected to boost bilateral trade from $180 billion to $250 billion by 2030.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "How many countries are members of the Gulf Cooperation Council that signed an FTA with India in 2025?",
@@ -220,7 +220,7 @@ export const march2025Part2: DayData[] = [
         title: "India's Renewable Energy Capacity Crosses 200 GW Mark",
         summary:
           "India's total installed renewable energy capacity crossed 200 GW, making it the third largest renewable energy producer in the world after China and the USA. Solar power accounts for 120 GW and wind energy for 50 GW of the total.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "After crossing 200 GW of renewable energy, India became the world's third largest renewable producer after which two countries?",
@@ -410,7 +410,7 @@ export const march2025Part2: DayData[] = [
           "Indian Railway Launches Hydrogen-Powered Train on Kalka-Shimla Route",
         summary:
           "Indian Railways launched the country's first hydrogen fuel cell train on the scenic Kalka-Shimla heritage railway route. The train runs on green hydrogen and emits only water vapour as exhaust, making it India's first zero-emission passenger train.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "India's first hydrogen fuel cell train was launched on which railway route?",
@@ -1065,7 +1065,7 @@ export const march2025Part2: DayData[] = [
         title: "India's Foreign Exchange Reserves Touch $700 Billion",
         summary:
           "India's foreign exchange reserves crossed the $700 billion mark for the first time, according to RBI data. The reserves, comprising foreign currency assets, gold, SDRs, and reserve tranche, provide over 12 months of import cover and make India the fourth largest holder of forex reserves globally.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "India's $700 billion forex reserves provide how many months of import cover?",
@@ -1233,7 +1233,7 @@ export const march2025Part2: DayData[] = [
         title: "RBI Launches Digital Rupee Retail Pilot Nationwide",
         summary:
           "The Reserve Bank of India expanded its Central Bank Digital Currency (CBDC) pilot — the e-Rupee — to all commercial banks and 50 cities. The digital rupee works offline in low-connectivity areas via NFC technology. The RBI aims for 100 million users by end of 2025.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "India's Central Bank Digital Currency (CBDC) is officially called?",
@@ -1413,7 +1413,7 @@ export const march2025Part2: DayData[] = [
         title: "India's Union Budget 2025-26: Key Highlights Summary",
         summary:
           "Finance Minister Nirmala Sitharaman presented a growth-oriented Union Budget 2025-26 with fiscal deficit pegged at 4.5% of GDP, capital expenditure of ₹11.11 lakh crore, income tax exemption raised to ₹12 lakh, and major boosts to infrastructure, agriculture, and MSMEs. The budget focussed on 'Viksit Bharat' 2047 goals.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "The Union Budget 2025-26 raised income tax exemption to how much per year?",

@@ -62,6 +62,7 @@ const BOTTOM_NAV_ITEMS: {
 }[] = [
   { label: "Home", page: "dashboard", id: "dashboard", Icon: Home },
   { label: "Daily CA", page: "daily-ca", id: "daily_ca", Icon: Newspaper },
+  { label: "Monthly CA", page: "monthly-ca", id: "monthly_ca", Icon: Calendar },
   { label: "Tests", page: "mock-test", id: "mock_test", Icon: ClipboardList },
   { label: "CA Quiz", page: "ca-quiz", id: "ca_quiz", Icon: Brain },
   { label: "Profile", page: "profile", id: "profile", Icon: User },

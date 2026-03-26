@@ -29,7 +29,7 @@ export const march2025Part1: DayData[] = [
         title: "India's GDP Growth Rate Revised to 6.4% for FY2025",
         summary:
           "The National Statistical Office revised India's GDP growth estimate for FY2024-25 to 6.4%, down from the earlier projection of 6.8%. The revision was attributed to slower growth in manufacturing and agriculture sectors.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "What was India's revised GDP growth rate for FY2024-25 as per NSO in March 2025?",
@@ -219,7 +219,7 @@ export const march2025Part1: DayData[] = [
         title: "India's Forex Reserves Rise to $640 Billion",
         summary:
           "India's foreign exchange reserves rose to $640 billion, the highest in four months, as per RBI data released in March 2025. The rise was attributed to capital inflows and RBI's market operations.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "India's forex reserves rose to how much in March 2025 as per RBI data?",
@@ -748,7 +748,7 @@ export const march2025Part1: DayData[] = [
         title: "RBI Cuts Repo Rate by 25 Basis Points to 6.25%",
         summary:
           "The Reserve Bank of India's Monetary Policy Committee cut the repo rate by 25 basis points to 6.25% in its March 2025 meeting, the second consecutive cut. The move aimed to stimulate economic growth amid global uncertainty and moderate domestic inflation.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "RBI cut the repo rate in March 2025 by 25 basis points to:",
@@ -845,7 +845,7 @@ export const march2025Part1: DayData[] = [
         title: "India's Manufacturing PMI Hits 11-Month High in February 2025",
         summary:
           "India's Manufacturing Purchasing Managers' Index (PMI) rose to 57.6 in February 2025, an 11-month high, indicating strong expansion in the manufacturing sector. New orders and production growth were the key drivers of the improvement.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "India's Manufacturing PMI in February 2025 rose to what value, an 11-month high?",
@@ -931,7 +931,7 @@ export const march2025Part1: DayData[] = [
         title: "India's Inflation Falls to 3.6% in February 2025",
         summary:
           "India's Consumer Price Index (CPI) based retail inflation fell to 3.6% in February 2025, well within the RBI's 4% target. The decline was driven by easing food prices, especially vegetables, and stable fuel costs.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question: "India's CPI retail inflation in February 2025 was:",
           options: ["3.2%", "3.6%", "4.1%", "4.5%"],

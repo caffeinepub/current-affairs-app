@@ -309,7 +309,7 @@ export const february2025Part1: DayData[] = [
         title: "India's Services PMI Hits 7-Month High in January 2025",
         summary:
           "India's Services Purchasing Managers' Index (PMI) rose to 56.5 in January 2025, a 7-month high, indicating robust expansion in the services sector. Strong domestic demand and new business orders drove the growth.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question: "A PMI reading above 50 indicates:",
           options: [
@@ -672,7 +672,7 @@ export const february2025Part1: DayData[] = [
         title: "India's Forex Reserves Rise to $630 Billion Mark",
         summary:
           "India's foreign exchange reserves rose to approximately $630 billion in February 2025, recovering from recent lows. The RBI's interventions and strong capital inflows from FDI and FPI helped stabilise the reserves.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question: "India's foreign exchange reserves are managed by:",
           options: [
@@ -860,7 +860,7 @@ export const february2025Part1: DayData[] = [
         title: "India Surpasses UK to Become 4th Largest Economy: IMF Data",
         summary:
           "According to IMF projections, India surpassed the United Kingdom to become the world's 4th largest economy in nominal GDP terms in 2025. India's GDP stood at approximately $4 trillion, ahead of the UK's $3.8 trillion.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "According to IMF 2025 projections, India's rank in the world by nominal GDP is:",
@@ -952,7 +952,7 @@ export const february2025Part1: DayData[] = [
         title: "India's Retail Inflation Eases to 4.3% in January 2025",
         summary:
           "India's retail inflation (CPI) eased to 4.3% in January 2025, down from 5.22% in December 2024, driven by lower food prices, particularly vegetables. The figure is within RBI's 4% target band with 2% tolerance.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question: "RBI's inflation target for India is:",
           options: [
@@ -1134,7 +1134,7 @@ export const february2025Part1: DayData[] = [
         title: "RBI Cuts Repo Rate by 25 bps to 6.25% to Boost Growth",
         summary:
           "The Reserve Bank of India's Monetary Policy Committee (MPC) cut the repo rate by 25 basis points to 6.25% in February 2025, the first rate cut in over 4 years. The decision aimed to boost economic growth amid easing inflation.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question: "After the February 2025 cut, India's repo rate stands at:",
           options: ["5.75%", "6.00%", "6.25%", "6.50%"],

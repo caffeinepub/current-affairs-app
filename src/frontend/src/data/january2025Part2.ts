@@ -9,7 +9,13 @@ export type NewsItem = {
   id: string;
   title: string;
   summary: string;
-  category: "Legal" | "National" | "International" | "Awards" | "Sports";
+  category:
+    | "Legal"
+    | "National"
+    | "International"
+    | "Economy"
+    | "Awards"
+    | "Sports";
   mcq: MCQ;
 };
 
@@ -144,7 +150,7 @@ export const january2025Part2: DayData[] = [
         title: "India's Retail Inflation Falls to 5.22% in December 2024",
         summary:
           "India's Consumer Price Index (CPI)-based retail inflation fell to 5.22% in December 2024, down from 5.48% in November. The decline was aided by easing vegetable prices, especially onion and tomato.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "CPI-based inflation measures price changes at which level?",
@@ -432,7 +438,7 @@ export const january2025Part2: DayData[] = [
         title: "Cabinet Approves ₹1 Lakh Crore PM Gati Shakti Road Projects",
         summary:
           "The Union Cabinet approved ₹1 lakh crore worth of road and highway projects under the PM Gati Shakti National Master Plan. The projects aim to improve multimodal connectivity across 25 states by 2027.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "PM Gati Shakti is a national plan focused on which sector?",
@@ -534,7 +540,7 @@ export const january2025Part2: DayData[] = [
         title: "India-UAE Bilateral Trade Hits $85 Billion in 2024",
         summary:
           "India-UAE bilateral trade reached $85 billion in 2024, making the UAE India's third-largest trading partner. The CEPA (Comprehensive Economic Partnership Agreement) signed in 2022 is credited for the rapid growth in trade volumes.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "India-UAE signed a CEPA in which year that boosted bilateral trade?",
@@ -621,7 +627,7 @@ export const january2025Part2: DayData[] = [
         title: "India's GDP Growth Projected at 6.5% for FY2025 by IMF",
         summary:
           "The International Monetary Fund projected India's GDP growth at 6.5% for FY2025, making it the fastest-growing major economy. The IMF cited strong domestic consumption, infrastructure spending, and services exports as key drivers.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question: "What GDP growth rate did IMF project for India in FY2025?",
           options: ["5.5%", "6.0%", "6.5%", "7.0%"],
@@ -1097,7 +1103,7 @@ export const january2025Part2: DayData[] = [
         title: "India's Tax-to-GDP Ratio Rises to 11.6% in 2024-25",
         summary:
           "India's tax-to-GDP ratio improved to 11.6% in 2024-25 as per Ministry of Finance data, reflecting improved tax compliance and the impact of GST rationalisation. Direct tax collections grew by 18% year-on-year.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "A higher Tax-to-GDP ratio indicates what about a country's economy?",
@@ -1391,7 +1397,7 @@ export const january2025Part2: DayData[] = [
         title: "India's Defence Budget 2025-26 Increased to ₹6.81 Lakh Crore",
         summary:
           "The Union Budget 2025-26 allocated ₹6.81 lakh crore to defence, a 9.5% increase over the previous year. Modernisation of Army, Navy, and Air Force and indigenisation under Atmanirbhar Bharat remain key priorities.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question: "India's Defence Budget 2025-26 was allocated how much?",
           options: [
@@ -1476,7 +1482,7 @@ export const january2025Part2: DayData[] = [
         title: "India's Manufacturing PMI Rises to 57.7 in January 2025",
         summary:
           "India's Manufacturing Purchasing Managers' Index (PMI) rose to 57.7 in January 2025, the highest in 14 years, signalling strong expansion in the manufacturing sector. New orders, output, and employment all showed significant growth.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "A PMI reading above which number indicates expansion in economic activity?",

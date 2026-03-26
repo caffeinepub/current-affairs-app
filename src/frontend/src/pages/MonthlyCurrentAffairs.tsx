@@ -222,6 +222,16 @@ function AccordionRow({
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {item.summary}
               </p>
+              {item.mcq.explanation && (
+                <div className="mt-3 px-3 py-2.5 rounded-lg bg-blue-500/8 border border-blue-500/20">
+                  <p className="text-[10px] font-semibold text-blue-400 mb-1">
+                    💡 Key Insight
+                  </p>
+                  <p className="text-xs text-blue-300/80 leading-relaxed">
+                    {item.mcq.explanation}
+                  </p>
+                </div>
+              )}
               <div className="flex items-center gap-2 mt-2 flex-wrap">
                 {imp && (
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-amber-500/40 text-amber-400 bg-amber-500/10">

@@ -24,7 +24,7 @@ export const april2025Part1: DayData[] = [
         title: "India's Manufacturing PMI Rises to 58.1 in March 2025",
         summary:
           "India's Manufacturing Purchasing Managers' Index (PMI) climbed to 58.1 in March 2025, the highest in 14 years, driven by strong domestic demand and export orders. The figure signals robust industrial expansion well above the 50-point growth threshold.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "India's Manufacturing PMI in March 2025 reached 58.1, the highest in how many years?",
@@ -110,7 +110,7 @@ export const april2025Part1: DayData[] = [
         title: "RBI Cuts Repo Rate by 25 Basis Points to 6.0%",
         summary:
           "The Reserve Bank of India's Monetary Policy Committee cut the repo rate by 25 basis points to 6.0% to boost economic growth amid easing inflation. This was the second consecutive rate cut in 2025, signalling an accommodative monetary stance to support investment and consumption.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "After RBI's April 2025 rate cut of 25 basis points, the repo rate stands at?",
@@ -1162,7 +1162,7 @@ export const april2025Part1: DayData[] = [
         title: "India's Solar Power Capacity Crosses 100 GW Milestone",
         summary:
           "India's total installed solar power capacity crossed the landmark 100 GW milestone, making it only the third country after China and the USA to achieve this. The Ministry of New and Renewable Energy attributed the growth to rooftop solar schemes, PM Surya Ghar Yojana, and large utility-scale projects.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "India's solar power capacity crossing 100 GW made it only the third country after China and which other nation?",

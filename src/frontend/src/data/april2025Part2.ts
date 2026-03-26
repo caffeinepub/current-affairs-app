@@ -29,7 +29,7 @@ export const april2025Part2: DayData[] = [
         title: "IMF Revises India GDP Growth Forecast to 6.8%",
         summary:
           "The International Monetary Fund revised India's GDP growth forecast for FY2025-26 upward to 6.8%, citing strong domestic consumption and robust manufacturing sector performance. India retained its position as the fastest growing major economy globally.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "To what level did the IMF revise India's GDP growth forecast for FY2025-26?",
@@ -311,7 +311,7 @@ export const april2025Part2: DayData[] = [
           "India Launches Smart Cities 2.0 Mission with Rs 1.2 Lakh Crore Outlay",
         summary:
           "The Union government launched Smart Cities 2.0 Mission with an outlay of Rs 1.2 lakh crore, focusing on integrated command centres, green infrastructure, and digital public services in 100 cities across India.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question: "What is the outlay for India's Smart Cities 2.0 Mission?",
           options: [
@@ -786,7 +786,7 @@ export const april2025Part2: DayData[] = [
         title: "India's Forex Reserves Hit All-Time High of $698 Billion",
         summary:
           "India's foreign exchange reserves reached an all-time high of $698 billion, providing over 11 months of import cover and reflecting strong capital inflows and effective current account management by the RBI.",
-        category: "National",
+        category: "Economy",
         mcq: {
           question:
             "India's foreign exchange reserves reached what all-time high in April 2025?",
