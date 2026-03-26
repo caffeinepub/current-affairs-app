@@ -1,182 +1,61 @@
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { april2025Part1 } from "@/data/april2025Part1";
 import { april2025Part2 } from "@/data/april2025Part2";
 import { february2025Part1 } from "@/data/february2025Part1";
 import { february2025Part2 } from "@/data/february2025Part2";
 import { january2025Part1 } from "@/data/january2025Part1";
-import type { NewsItem as StaticNewsItem } from "@/data/january2025Part1";
+import type { NewsItem } from "@/data/january2025Part1";
 import { january2025Part2 } from "@/data/january2025Part2";
 import { march2025Part1 } from "@/data/march2025Part1";
 import { march2025Part2 } from "@/data/march2025Part2";
 import { getCategoryColor } from "@/lib/utils-ca";
-import { BookMarked, Calendar, CheckCircle2, Eye, XCircle } from "lucide-react";
+import {
+  BookOpen,
+  Calendar,
+  CheckCircle2,
+  ChevronDown,
+  XCircle,
+  Zap,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
 
-type MCQCardProps = { item: StaticNewsItem; index: number };
+type TimeFilter = "Today" | "This Week" | "This Month" | "All Time";
+type CategoryFilter =
+  | "All"
+  | "National"
+  | "International"
+  | "Legal"
+  | "Awards"
+  | "Sports";
 
-function MCQCard({ item, index }: MCQCardProps) {
-  const [selected, setSelected] = useState<number | null>(null);
-  const [showMCQ, setShowMCQ] = useState(false);
-  const [markedRead, setMarkedRead] = useState(false);
-  const [markedRevise, setMarkedRevise] = useState(false);
+const TIME_FILTERS: TimeFilter[] = [
+  "Today",
+  "This Week",
+  "This Month",
+  "All Time",
+];
+const CATEGORIES: CategoryFilter[] = [
+  "All",
+  "National",
+  "International",
+  "Legal",
+  "Awards",
+  "Sports",
+];
 
-  function optionClass(i: number) {
-    const base =
-      "w-full text-left px-4 py-2.5 rounded-lg border text-sm font-medium transition-all duration-200 ";
-    if (selected === null) {
-      return `${base}border-border hover:border-primary hover:bg-primary/10 text-foreground`;
-    }
-    if (i === item.mcq.correctIndex) {
-      return `${base}border-success bg-success/10 text-success`;
-    }
-    if (i === selected) {
-      return `${base}border-destructive bg-destructive/10 text-destructive`;
-    }
-    return `${base}border-border text-muted-foreground opacity-50`;
-  }
+const ALL_DAYS = [
+  ...january2025Part1,
+  ...january2025Part2,
+  ...february2025Part1,
+  ...february2025Part2,
+  ...march2025Part1,
+  ...march2025Part2,
+  ...april2025Part1,
+  ...april2025Part2,
+];
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.06, duration: 0.3 }}
-      className={`bg-card border rounded-xl p-5 shadow-card transition-colors ${
-        markedRead
-          ? "border-success/40"
-          : markedRevise
-            ? "border-warning/40"
-            : "border-border"
-      }`}
-      data-ocid={`ca.card.${index + 1}`}
-    >
-      {/* Category and actions */}
-      <div className="flex items-center gap-2 mb-2.5 flex-wrap">
-        <span
-          className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${getCategoryColor(item.category)} inline-block`}
-        >
-          {item.category}
-        </span>
-        <div className="ml-auto flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => {
-              setMarkedRead(!markedRead);
-              setMarkedRevise(false);
-            }}
-            className={`flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md border transition-colors ${
-              markedRead
-                ? "border-success/60 bg-success/10 text-success"
-                : "border-border text-muted-foreground hover:border-success/40 hover:text-success"
-            }`}
-            data-ocid={`ca.card.${index + 1}.mark_read`}
-          >
-            <CheckCircle2 className="w-3 h-3" />
-            {markedRead ? "Read" : "Mark Read"}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setMarkedRevise(!markedRevise);
-              setMarkedRead(false);
-            }}
-            className={`flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md border transition-colors ${
-              markedRevise
-                ? "border-warning/60 bg-warning/10 text-warning"
-                : "border-border text-muted-foreground hover:border-warning/40 hover:text-warning"
-            }`}
-            data-ocid={`ca.card.${index + 1}.mark_revise`}
-          >
-            <BookMarked className="w-3 h-3" />
-            {markedRevise ? "Revise" : "Mark Revise"}
-          </button>
-        </div>
-      </div>
-
-      {/* News content */}
-      <h3 className="text-sm font-bold text-foreground leading-snug mb-1.5">
-        {item.title}
-      </h3>
-      <p className="text-xs text-muted-foreground leading-relaxed mb-3">
-        {item.summary}
-      </p>
-
-      {/* Practice MCQ toggle */}
-      <button
-        type="button"
-        onClick={() => setShowMCQ(!showMCQ)}
-        className="flex items-center gap-1.5 text-xs font-medium text-primary border border-primary/30 bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors"
-        data-ocid={`ca.card.${index + 1}.practice_mcq`}
-      >
-        <Eye className="w-3.5 h-3.5" />
-        {showMCQ ? "Hide MCQ" : "Practice MCQ"}
-      </button>
-
-      {/* MCQ section */}
-      <AnimatePresence>
-        {showMCQ && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25 }}
-            className="overflow-hidden"
-          >
-            <div className="mt-4 pt-4 border-t border-border">
-              <p className="text-sm font-semibold text-foreground mb-3 leading-snug">
-                {item.mcq.question}
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {item.mcq.options.map((opt, i) => (
-                  <button
-                    key={opt}
-                    type="button"
-                    onClick={() => selected === null && setSelected(i)}
-                    disabled={selected !== null}
-                    className={optionClass(i)}
-                    data-ocid={`ca.card.${index + 1}.option.${i + 1}`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <span className="w-5 h-5 rounded-full border border-current flex-shrink-0 flex items-center justify-center text-[10px] font-bold">
-                        {["A", "B", "C", "D"][i]}
-                      </span>
-                      {opt}
-                      {selected !== null && i === item.mcq.correctIndex && (
-                        <CheckCircle2 className="w-4 h-4 ml-auto flex-shrink-0" />
-                      )}
-                      {selected === i && i !== item.mcq.correctIndex && (
-                        <XCircle className="w-4 h-4 ml-auto flex-shrink-0" />
-                      )}
-                    </span>
-                  </button>
-                ))}
-              </div>
-              {selected !== null && (
-                <motion.div
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`mt-3 p-3 rounded-lg text-xs leading-relaxed ${
-                    selected === item.mcq.correctIndex
-                      ? "bg-success/10 text-success border border-success/20"
-                      : "bg-destructive/10 text-destructive border border-destructive/20"
-                  }`}
-                >
-                  <span className="font-semibold">
-                    {selected === item.mcq.correctIndex
-                      ? "Correct! "
-                      : "Incorrect. "}
-                  </span>
-                  {item.mcq.explanation}
-                </motion.div>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-}
+const OPTION_LABELS = ["A", "B", "C", "D"];
 
 function displayDate(dateStr: string): string {
   const [y, m, d] = dateStr.split("-").map(Number);
@@ -188,47 +67,225 @@ function displayDate(dateStr: string): string {
   });
 }
 
-type CategoryFilter =
-  | "All"
-  | "Legal"
-  | "National"
-  | "International"
-  | "Awards"
-  | "Sports";
-const CATEGORIES: CategoryFilter[] = [
-  "All",
-  "Legal",
-  "National",
-  "International",
-  "Awards",
-  "Sports",
-];
+type MCQSectionProps = { item: NewsItem; index: number };
+
+function MCQSection({ item, index }: MCQSectionProps) {
+  const [selected, setSelected] = useState<number | null>(null);
+
+  function optionClass(i: number) {
+    const base =
+      "w-full text-left px-3 py-2 rounded-lg border text-sm transition-all duration-150 flex items-center gap-2.5 ";
+    if (selected === null) {
+      return `${base}border-border hover:border-primary/60 hover:bg-primary/5 text-foreground`;
+    }
+    if (i === item.mcq.correctIndex) {
+      return `${base}border-green-500/60 bg-green-500/10 text-green-400`;
+    }
+    if (i === selected) {
+      return `${base}border-red-500/60 bg-red-500/10 text-red-400`;
+    }
+    return `${base}border-border text-muted-foreground opacity-40`;
+  }
+
+  return (
+    <div className="mt-4 pt-4 border-t border-border">
+      <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
+        Practice MCQ
+      </p>
+      <p className="text-sm font-medium text-foreground mb-3 leading-snug">
+        {item.mcq.question}
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+        {item.mcq.options.map((opt, i) => (
+          <button
+            key={`opt-${OPTION_LABELS[i]}`}
+            type="button"
+            onClick={() => selected === null && setSelected(i)}
+            disabled={selected !== null}
+            className={optionClass(i)}
+            data-ocid={`ca.item.${index + 1}.option.${i + 1}`}
+          >
+            <span className="w-5 h-5 rounded-full border border-current flex-shrink-0 flex items-center justify-center text-[10px] font-bold">
+              {OPTION_LABELS[i]}
+            </span>
+            <span className="flex-1">{opt}</span>
+            {selected !== null && i === item.mcq.correctIndex && (
+              <CheckCircle2 className="w-4 h-4 ml-auto flex-shrink-0" />
+            )}
+            {selected === i && i !== item.mcq.correctIndex && (
+              <XCircle className="w-4 h-4 ml-auto flex-shrink-0" />
+            )}
+          </button>
+        ))}
+      </div>
+      {selected !== null && (
+        <motion.div
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`mt-3 p-3 rounded-lg text-xs leading-relaxed ${
+            selected === item.mcq.correctIndex
+              ? "bg-green-500/10 text-green-400 border border-green-500/20"
+              : "bg-red-500/10 text-red-400 border border-red-500/20"
+          }`}
+        >
+          <span className="font-semibold">
+            {selected === item.mcq.correctIndex
+              ? "\u2713 Correct! "
+              : "\u2717 Incorrect. "}
+          </span>
+          {item.mcq.explanation}
+        </motion.div>
+      )}
+    </div>
+  );
+}
+
+type AccordionRowProps = {
+  item: NewsItem;
+  dateStr: string;
+  index: number;
+  isExpanded: boolean;
+  onToggle: () => void;
+  quickMode: boolean;
+};
+
+function AccordionRow({
+  item,
+  dateStr,
+  index,
+  isExpanded,
+  onToggle,
+  quickMode,
+}: AccordionRowProps) {
+  return (
+    <div
+      className={`border-b border-border last:border-0 transition-colors ${
+        isExpanded ? "bg-muted/20" : "hover:bg-muted/10"
+      }`}
+    >
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full text-left px-4 py-3 flex items-center gap-3 cursor-pointer"
+        data-ocid={`ca.item.${index + 1}.toggle`}
+      >
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-foreground leading-snug">
+            {item.title}
+          </p>
+          <div className="flex items-center gap-2 mt-1.5">
+            <span
+              className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${getCategoryColor(item.category)} inline-block`}
+            >
+              {item.category}
+            </span>
+            <span className="text-[11px] text-muted-foreground">
+              {displayDate(dateStr)}
+            </span>
+          </div>
+        </div>
+        <ChevronDown
+          className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform duration-200 ${
+            isExpanded ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      <AnimatePresence>
+        {isExpanded && !quickMode && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="overflow-hidden"
+          >
+            <div className="px-4 pb-4">
+              <p className="text-sm text-muted-foreground leading-relaxed mb-0">
+                {item.summary}
+              </p>
+              <MCQSection item={item} index={index} />
+            </div>
+          </motion.div>
+        )}
+        {isExpanded && quickMode && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="overflow-hidden"
+          >
+            <div className="px-4 pb-3">
+              <p className="text-xs text-muted-foreground italic">
+                Quick revision mode \u2014 summary hidden
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function getWeekStart(): string {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(now.setDate(diff));
+  return monday.toISOString().split("T")[0];
+}
 
 export function DailyCurrentAffairs() {
-  const [selectedDate, setSelectedDate] = useState("2025-01-15");
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("All Time");
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("All");
+  const [dateOverride, setDateOverride] = useState("");
+  const [expandedKey, setExpandedKey] = useState<string | null>(null);
+  const [quickMode, setQuickMode] = useState(false);
 
-  const dayData = useMemo(() => {
-    const allDays = [
-      ...january2025Part1,
-      ...january2025Part2,
-      ...february2025Part1,
-      ...february2025Part2,
-      ...march2025Part1,
-      ...march2025Part2,
-      ...april2025Part1,
-      ...april2025Part2,
-    ];
-    return allDays.find((d) => d.date === selectedDate) ?? null;
-  }, [selectedDate]);
+  const filteredGroups = useMemo(() => {
+    if (dateOverride) {
+      const day = ALL_DAYS.find((d) => d.date === dateOverride);
+      if (!day) return [];
+      const news =
+        categoryFilter === "All"
+          ? day.news
+          : day.news.filter((n) => n.category === categoryFilter);
+      return news.length > 0 ? [{ date: day.date, news }] : [];
+    }
 
-  const filteredNews = useMemo(() => {
-    if (!dayData) return [];
-    if (categoryFilter === "All") return dayData.news;
-    return dayData.news.filter((n) => n.category === categoryFilter);
-  }, [dayData, categoryFilter]);
+    const today = new Date().toISOString().split("T")[0];
+    const weekStart = getWeekStart();
+    const now = new Date();
+    const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
 
-  const hasData = dayData !== null;
+    let days = ALL_DAYS;
+    if (timeFilter === "Today") {
+      days = ALL_DAYS.filter((d) => d.date === today);
+    } else if (timeFilter === "This Week") {
+      days = ALL_DAYS.filter((d) => d.date >= weekStart && d.date <= today);
+    } else if (timeFilter === "This Month") {
+      days = ALL_DAYS.filter((d) => d.date >= monthStart && d.date <= today);
+    }
+
+    const sorted = [...days].sort((a, b) => (a.date > b.date ? -1 : 1));
+    return sorted
+      .map((day) => {
+        const news =
+          categoryFilter === "All"
+            ? day.news
+            : day.news.filter((n) => n.category === categoryFilter);
+        return { date: day.date, news };
+      })
+      .filter((g) => g.news.length > 0);
+  }, [timeFilter, categoryFilter, dateOverride]);
+
+  function toggleItem(dateStr: string, id: string) {
+    const key = `${dateStr}-${id}`;
+    setExpandedKey((prev) => (prev === key ? null : key));
+  }
+
+  let globalIdx = 0;
 
   return (
     <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-6">
@@ -237,89 +294,192 @@ export function DailyCurrentAffairs() {
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
-        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5"
+        className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-5"
       >
-        <div>
-          <h1 className="text-2xl font-display font-bold text-foreground">
-            Daily Current Affairs
-          </h1>
-          <p className="text-muted-foreground text-sm mt-0.5">
-            {displayDate(selectedDate)}
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <BookOpen className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground leading-tight">
+              Daily Current Affairs
+            </h1>
+            <p className="text-muted-foreground text-xs mt-0.5">
+              Stay updated with important news for TS LAWCET
+            </p>
+          </div>
         </div>
-        <label className="flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2 shadow-xs cursor-pointer hover:border-primary transition-colors">
-          <Calendar className="w-4 h-4 text-primary flex-shrink-0" />
+        <Button
+          variant={quickMode ? "default" : "outline"}
+          size="sm"
+          onClick={() => setQuickMode((v) => !v)}
+          className="flex items-center gap-1.5 flex-shrink-0 self-start sm:self-auto"
+          data-ocid="daily_ca.quick_revision_toggle"
+        >
+          <Zap className="w-3.5 h-3.5" />
+          Quick Revision
+        </Button>
+      </motion.div>
+
+      {/* Time filter row */}
+      <div className="flex items-center gap-1.5 flex-wrap mb-3">
+        {TIME_FILTERS.map((tf) => (
+          <button
+            key={tf}
+            type="button"
+            onClick={() => {
+              setTimeFilter(tf);
+              setDateOverride("");
+            }}
+            className={`text-xs px-3.5 py-1.5 rounded-full border font-medium transition-colors ${
+              timeFilter === tf && !dateOverride
+                ? "bg-primary text-primary-foreground border-primary"
+                : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
+            }`}
+            data-ocid={`daily_ca.time_filter.${tf.toLowerCase().replace(" ", "_")}`}
+          >
+            {tf}
+          </button>
+        ))}
+        <label className="flex items-center gap-1.5 ml-auto bg-card border border-border rounded-lg px-2.5 py-1 cursor-pointer hover:border-primary/50 transition-colors">
+          <Calendar className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
           <input
             type="date"
-            value={selectedDate}
+            value={dateOverride}
             min="2025-01-01"
             max="2025-04-30"
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="bg-transparent text-sm font-medium text-foreground outline-none cursor-pointer"
+            onChange={(e) => {
+              setDateOverride(e.target.value);
+              setTimeFilter("All Time");
+            }}
+            className="bg-transparent text-xs font-medium text-foreground outline-none cursor-pointer"
             style={{ colorScheme: "dark" }}
             data-ocid="daily_ca.date_input"
           />
         </label>
-      </motion.div>
+      </div>
 
-      {/* Category Filter */}
+      {/* Category filter row */}
       <div className="flex items-center gap-1.5 flex-wrap mb-5">
         {CATEGORIES.map((cat) => (
           <button
             key={cat}
             type="button"
             onClick={() => setCategoryFilter(cat)}
-            className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${
+            className={`text-xs px-3.5 py-1.5 rounded-full border font-medium transition-colors ${
               categoryFilter === cat
                 ? "bg-primary text-primary-foreground border-primary"
                 : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
             }`}
-            data-ocid={`daily_ca.filter.${cat.toLowerCase()}`}
+            data-ocid={`daily_ca.cat_filter.${cat.toLowerCase()}`}
           >
             {cat}
           </button>
         ))}
       </div>
 
+      {/* Quick Revision banner */}
+      <AnimatePresence>
+        {quickMode && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            className="mb-4 px-4 py-2.5 rounded-lg border text-xs text-primary flex items-center gap-2 bg-primary/10 border-primary/30"
+          >
+            <Zap className="w-3.5 h-3.5 flex-shrink-0" />
+            Quick Revision Mode \u2014 summaries and MCQs are hidden
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Content */}
-      {!hasData ? (
+      {filteredGroups.length === 0 ? (
         <div
           className="bg-card border border-border rounded-xl px-6 py-12 text-center"
-          data-ocid="ca.no_data_state"
+          data-ocid="daily_ca.empty_state"
         >
           <p className="text-muted-foreground text-sm">
-            Content available for January 1 – March 15, 2025. Select a date in
-            that range.
+            {timeFilter === "Today"
+              ? "No content available for today. Content covers Jan 1 \u2013 Apr 30, 2025."
+              : "No content matches the selected filters."}
           </p>
           <p className="text-muted-foreground text-xs mt-1">
-            More dates coming soon.
-          </p>
-        </div>
-      ) : filteredNews.length === 0 ? (
-        <div className="bg-card border border-border rounded-xl px-6 py-10 text-center">
-          <p className="text-muted-foreground text-sm">
-            No {categoryFilter} news for this date.
+            Try \u201cAll Time\u201d or select a specific date.
           </p>
         </div>
       ) : (
-        <>
-          <div className="flex items-center gap-2 mb-3">
-            <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              Top Stories
-            </h2>
-            <Badge variant="secondary" className="text-[10px]">
-              {filteredNews.length} items
-            </Badge>
-          </div>
-          <div className="flex flex-col gap-4">
-            <AnimatePresence mode="wait">
-              {filteredNews.map((item, idx) => (
-                <MCQCard key={item.id} item={item} index={idx} />
-              ))}
-            </AnimatePresence>
-          </div>
-        </>
+        <div className="flex flex-col gap-5">
+          {filteredGroups.map((group) => {
+            const groupStartIdx = globalIdx;
+            globalIdx += group.news.length;
+            return (
+              <DateGroup
+                key={group.date}
+                date={group.date}
+                news={group.news}
+                expandedKey={expandedKey}
+                onToggle={toggleItem}
+                quickMode={quickMode}
+                startIdx={groupStartIdx}
+              />
+            );
+          })}
+        </div>
       )}
     </div>
+  );
+}
+
+type DateGroupProps = {
+  date: string;
+  news: NewsItem[];
+  expandedKey: string | null;
+  onToggle: (date: string, id: string) => void;
+  quickMode: boolean;
+  startIdx: number;
+};
+
+function DateGroup({
+  date,
+  news,
+  expandedKey,
+  onToggle,
+  quickMode,
+  startIdx,
+}: DateGroupProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-1 h-5 rounded-full bg-primary flex-shrink-0" />
+        <h2 className="text-sm font-bold text-foreground">
+          {displayDate(date)}
+        </h2>
+        <span className="text-xs text-muted-foreground">
+          \u00b7 {news.length} items
+        </span>
+      </div>
+
+      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+        {news.map((item, i) => {
+          const itemKey = `${date}-${item.id}`;
+          return (
+            <AccordionRow
+              key={item.id}
+              item={item}
+              dateStr={date}
+              index={startIdx + i}
+              isExpanded={expandedKey === itemKey}
+              onToggle={() => onToggle(date, item.id)}
+              quickMode={quickMode}
+            />
+          );
+        })}
+      </div>
+    </motion.div>
   );
 }

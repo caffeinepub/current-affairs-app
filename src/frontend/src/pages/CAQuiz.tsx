@@ -5,6 +5,7 @@ import {
   Brain,
   CheckCircle,
   ChevronRight,
+  Home,
   Trophy,
   X,
   XCircle,
@@ -89,7 +90,7 @@ function storeScore(dateStr: string, score: number) {
   localStorage.setItem(`ca_quiz_score_${dateStr}`, String(score));
 }
 
-export function CAQuiz() {
+export function CAQuiz({ onNavigateHome }: { onNavigateHome?: () => void }) {
   const [screen, setScreen] = useState<Screen>("day-selector");
   const [selectedDay, setSelectedDay] = useState<DayData | null>(null);
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
@@ -434,6 +435,19 @@ export function CAQuiz() {
               );
             })}
           </div>
+          {onNavigateHome && (
+            <div className="flex justify-center mt-8">
+              <button
+                type="button"
+                onClick={onNavigateHome}
+                data-ocid="ca_quiz.primary_button"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-primary text-primary-foreground hover:opacity-90 active:scale-[0.98] transition-all"
+              >
+                <Home className="w-4 h-4" />
+                Return to Home
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );

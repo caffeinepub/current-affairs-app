@@ -1001,7 +1001,7 @@ function AppContent() {
   if (activePage === "mock-test") {
     return (
       <div className="relative min-h-screen">
-        <MockTest />
+        <MockTest onNavigateHome={() => setActivePage("dashboard")} />
         <MobileBottomNav
           activePage={activePage}
           setActivePage={setActivePage}
@@ -1019,7 +1019,9 @@ function AppContent() {
       {activePage === "daily-ca" && <DailyCurrentAffairs />}
       {activePage === "monthly-ca" && <MonthlyCurrentAffairs />}
       {activePage === "performance" && <Performance />}
-      {activePage === "ca-quiz" && <CAQuiz />}
+      {activePage === "ca-quiz" && (
+        <CAQuiz onNavigateHome={() => setActivePage("dashboard")} />
+      )}
       {activePage === "profile" && <Profile />}
       <MobileBottomNav activePage={activePage} setActivePage={setActivePage} />
       <AnimatePresence>

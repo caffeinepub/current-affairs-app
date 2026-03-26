@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  Home,
   Maximize2,
   XCircle,
 } from "lucide-react";
@@ -537,7 +538,7 @@ const TOPIC_COLORS: Record<string, string> = {
   Sports: "text-yellow-400 bg-yellow-400/10",
 };
 
-export function MockTest() {
+export function MockTest({ onNavigateHome }: { onNavigateHome?: () => void }) {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<(number | null)[]>(
     Array(50).fill(null),
@@ -786,6 +787,19 @@ export function MockTest() {
               );
             })}
           </div>
+          {onNavigateHome && (
+            <div className="flex justify-center mt-8">
+              <button
+                type="button"
+                onClick={onNavigateHome}
+                data-ocid="mock_test.primary_button"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-primary text-primary-foreground hover:opacity-90 active:scale-[0.98] transition-all"
+              >
+                <Home className="w-4 h-4" />
+                Return to Home
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );

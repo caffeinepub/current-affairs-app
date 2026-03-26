@@ -1,37 +1,34 @@
 # Current Affairs App
 
 ## Current State
-- Authentication uses Internet Identity (ICP-native)
-- LoginScreen shows a single "Sign In with Internet Identity" button
-- Auth state managed via `useInternetIdentity` hook in `src/frontend/src/lib/auth.ts`
-- App shows login screen if not authenticated, main app if authenticated
+- DailyCurrentAffairs: Date picker, category filter pills, big card layout per news item with inline MCQ toggle
+- MonthlyCurrentAffairs: List of all months as accordion cards, expand each month to see days, expand days to see news
 
 ## Requested Changes (Diff)
 
 ### Add
-- Firebase SDK (firebase package) installed as a dependency
-- `src/frontend/src/lib/firebase.ts` -- Firebase app initialization with provided config
-- Email/Password sign-up and sign-in forms in the LoginScreen
-- Google Sign-In button using Firebase Google Auth provider
-- Toggle between "Sign In" and "Sign Up" modes on the login screen
-- Persistent auth session via Firebase (onAuthStateChanged) -- user stays logged in until they manually log out
+- Daily CA: Time filter row (Today / This Week / This Month / All Time + date picker)
+- Daily CA: Date group headers with item count and left blue border accent (e.g. "Saturday, 15 January 2025 · 5 items")
+- Daily CA: Accordion-style compact news rows (title + category badge + chevron; expand to show summary + MCQ)
+- Daily CA: Quick Revision button in header
+- Monthly CA: Single-month view with prev/next arrow navigation
+- Monthly CA: Category stats cards row (National, International, Legal, Awards, Sports with counts and colors)
+- Monthly CA: Important Highlights section (one story per category)
+- Monthly CA: Category filter chips with counts (All, National(n), International(n), Legal(n), Awards(n), Sports(n))
+- Monthly CA: Flat accordion list of all news in month, sorted by date
 
 ### Modify
-- `src/frontend/src/lib/auth.ts` -- Replace useInternetIdentity with Firebase auth (onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup GoogleAuthProvider, signOut)
-- `src/frontend/src/App.tsx` -- Update LoginScreen to show email/password fields + Google button; show error messages for wrong credentials; show loading states
+- Daily CA: Replace large card layout with compact accordion rows grouped by date
+- Daily CA: Header style — add icon, subtitle, Quick Revision button
+- Monthly CA: Replace "all months list" with single-month navigation
+- Monthly CA: News items shown as flat accordion list (not nested day > news)
 
 ### Remove
-- All references to `useInternetIdentity` and Internet Identity login
+- Daily CA: Large card design with always-visible summary
+- Monthly CA: Month list accordion with day-level expand inside
 
 ## Implementation Plan
-1. Install `firebase` npm package
-2. Create `src/frontend/src/lib/firebase.ts` with Firebase config initialization
-3. Rewrite `src/frontend/src/lib/auth.ts` to use Firebase auth with persistent sessions
-4. Update `LoginScreen` in `App.tsx`:
-   - Email input + Password input
-   - Sign In / Sign Up toggle
-   - Google Sign-In button
-   - Error display
-   - Loading states
-5. Remove Internet Identity imports/usage
-6. Validate and build
+1. Rewrite DailyCurrentAffairs.tsx with new layout: header, time filters, category filters, date-grouped accordion list
+2. Rewrite MonthlyCurrentAffairs.tsx with single-month view: header, month nav, category stats cards, highlights, category filter chips, flat accordion list
+3. Both pages keep existing data sources (static data files)
+4. Accordion expand shows summary text + MCQ inline
