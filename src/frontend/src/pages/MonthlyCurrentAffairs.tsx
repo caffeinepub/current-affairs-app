@@ -18,7 +18,7 @@ import {
   Zap,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type DayData = { date: string; news: NewsItem[] };
 
@@ -56,6 +56,12 @@ const CATEGORY_COLORS: Record<
     border: "border-purple-500/30",
     dot: "bg-purple-400",
   },
+  Economy: {
+    bg: "bg-green-500/10",
+    text: "text-green-400",
+    border: "border-green-500/30",
+    dot: "bg-green-400",
+  },
   Legal: {
     bg: "bg-amber-500/10",
     text: "text-amber-400",
@@ -69,10 +75,10 @@ const CATEGORY_COLORS: Record<
     dot: "bg-pink-400",
   },
   Sports: {
-    bg: "bg-green-500/10",
-    text: "text-green-400",
-    border: "border-green-500/30",
-    dot: "bg-green-400",
+    bg: "bg-teal-500/10",
+    text: "text-teal-400",
+    border: "border-teal-500/30",
+    dot: "bg-teal-400",
   },
 };
 
@@ -90,6 +96,11 @@ const STAT_CARD_COLORS: Record<
     bg: "bg-purple-500/10",
     border: "border-purple-500/20",
   },
+  Economy: {
+    count: "text-green-400",
+    bg: "bg-green-500/10",
+    border: "border-green-500/20",
+  },
   Legal: {
     count: "text-amber-400",
     bg: "bg-amber-500/10",
@@ -101,19 +112,34 @@ const STAT_CARD_COLORS: Record<
     border: "border-pink-500/20",
   },
   Sports: {
-    count: "text-green-400",
-    bg: "bg-green-500/10",
-    border: "border-green-500/20",
+    count: "text-teal-400",
+    bg: "bg-teal-500/10",
+    border: "border-teal-500/20",
   },
 };
 
 const CATEGORY_LIST = [
   "National",
   "International",
+  "Economy",
   "Legal",
   "Awards",
   "Sports",
 ];
+
+function simpleHash(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+function isImportant(item: NewsItem): boolean {
+  return item.category === "Legal" || simpleHash(item.id) % 5 === 0;
+}
+
+function isExamLikely(item: NewsItem): boolean {
+  return simpleHash(item.id) % 3 === 0;
+}
 
 function displayDate(dateStr: string): string {
   const [y, m, d] = dateStr.split("-").map(Number);
@@ -140,6 +166,8 @@ function AccordionRow({
   onToggle,
   quickMode,
 }: AccordionRowProps) {
+  const imp = isImportant(item);
+  const exam = isExamLikely(item);
   return (
     <div
       className={`border-b border-border last:border-0 transition-colors ${
@@ -156,12 +184,22 @@ function AccordionRow({
           <p className="text-sm font-semibold text-foreground leading-snug">
             {item.title}
           </p>
-          <div className="flex items-center gap-2 mt-1.5">
+          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
             <span
               className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${getCategoryColor(item.category)} inline-block`}
             >
               {item.category}
             </span>
+            {imp && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full border border-amber-500/30 text-amber-400 bg-amber-500/5">
+                ⭐
+              </span>
+            )}
+            {exam && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full border border-blue-500/30 text-blue-400 bg-blue-500/5">
+                📘
+              </span>
+            )}
           </div>
         </div>
         <ChevronDown
@@ -184,6 +222,18 @@ function AccordionRow({
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {item.summary}
               </p>
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                {imp && (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-amber-500/40 text-amber-400 bg-amber-500/10">
+                    ⭐ Most Important
+                  </span>
+                )}
+                {exam && (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-blue-500/40 text-blue-400 bg-blue-500/10">
+                    📘 Exam Likely
+                  </span>
+                )}
+              </div>
             </div>
           </motion.div>
         )}
@@ -196,6 +246,7 @@ export function MonthlyCurrentAffairs() {
   const [monthIdx, setMonthIdx] = useState(0);
   const [categoryFilter, setCategoryFilter] = useState<string>("All");
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
+  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
   const [highlightsExpanded, setHighlightsExpanded] = useState(true);
   const [quickMode, setQuickMode] = useState(false);
 
@@ -260,6 +311,32 @@ export function MonthlyCurrentAffairs() {
     withDates.sort((a, b) => (a.date < b.date ? -1 : 1));
     return withDates;
   }, [currentMonth, categoryFilter]);
+
+  const groupedNews = useMemo(() => {
+    const groups: {
+      date: string;
+      items: { item: NewsItem; date: string }[];
+    }[] = [];
+    let currentGroup: {
+      date: string;
+      items: { item: NewsItem; date: string }[];
+    } | null = null;
+    for (const entry of sortedFilteredNews) {
+      if (!currentGroup || currentGroup.date !== entry.date) {
+        currentGroup = { date: entry.date, items: [] };
+        groups.push(currentGroup);
+      }
+      currentGroup.items.push(entry);
+    }
+    return groups;
+  }, [sortedFilteredNews]);
+
+  useEffect(() => {
+    setExpandedDays(
+      new Set(groupedNews.length > 0 ? [groupedNews[0].date] : []),
+    );
+    setExpandedKey(null);
+  }, [groupedNews]);
 
   function toggleItem(id: string) {
     setExpandedKey((prev) => (prev === id ? null : id));
@@ -336,7 +413,7 @@ export function MonthlyCurrentAffairs() {
             {currentMonth?.label}
           </p>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {monthDaysWithNews} days \u00b7 {monthNews.length} news items
+            {monthDaysWithNews} days · {monthNews.length} news items
           </p>
         </div>
 
@@ -356,7 +433,7 @@ export function MonthlyCurrentAffairs() {
       </div>
 
       {/* Category Stats Cards */}
-      <div className="grid grid-cols-5 gap-2 mb-5">
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-5">
         {CATEGORY_LIST.map((cat) => {
           const colors = STAT_CARD_COLORS[cat];
           return (
@@ -476,8 +553,8 @@ export function MonthlyCurrentAffairs() {
         })}
       </div>
 
-      {/* Flat accordion list */}
-      {sortedFilteredNews.length === 0 ? (
+      {/* Day-grouped accordion list */}
+      {groupedNews.length === 0 ? (
         <div
           className="bg-card border border-border rounded-xl px-6 py-10 text-center"
           data-ocid="monthly_ca.empty_state"
@@ -487,26 +564,73 @@ export function MonthlyCurrentAffairs() {
           </p>
         </div>
       ) : (
-        <div className="bg-card border border-border rounded-xl overflow-hidden">
-          {sortedFilteredNews.map(({ item, date }, idx) => (
-            <div key={`${date}-${item.id}`}>
-              {(idx === 0 || sortedFilteredNews[idx - 1].date !== date) && (
-                <div className="flex items-center gap-2 px-4 py-2 bg-muted/20 border-b border-border">
-                  <div className="w-0.5 h-3 rounded-full bg-primary flex-shrink-0" />
-                  <span className="text-xs font-medium text-muted-foreground">
-                    {displayDate(date)}
-                  </span>
-                </div>
-              )}
-              <AccordionRow
-                item={item}
-                index={idx}
-                isExpanded={expandedKey === `${date}-${item.id}`}
-                onToggle={() => toggleItem(`${date}-${item.id}`)}
-                quickMode={quickMode}
-              />
-            </div>
-          ))}
+        <div>
+          {groupedNews.map((dayGroup) => {
+            const isDayOpen = expandedDays.has(dayGroup.date);
+            return (
+              <div
+                key={dayGroup.date}
+                className="bg-card border border-border rounded-xl overflow-hidden mb-3"
+              >
+                <button
+                  type="button"
+                  onClick={() =>
+                    setExpandedDays((prev) => {
+                      const next = new Set(prev);
+                      if (next.has(dayGroup.date)) next.delete(dayGroup.date);
+                      else next.add(dayGroup.date);
+                      return next;
+                    })
+                  }
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/10 transition-colors"
+                  data-ocid="monthly_ca.row"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-4 rounded-full bg-primary flex-shrink-0" />
+                    <span className="text-sm font-semibold text-foreground">
+                      {displayDate(dayGroup.date)}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-full font-medium">
+                      {dayGroup.items.length} news
+                    </span>
+                    <ChevronDown
+                      className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
+                        isDayOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </div>
+                </button>
+                <AnimatePresence>
+                  {isDayOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      className="overflow-hidden border-t border-border"
+                    >
+                      {dayGroup.items.map(({ item }, idx) => (
+                        <AccordionRow
+                          key={item.id}
+                          item={item}
+                          index={idx}
+                          isExpanded={
+                            expandedKey === `${dayGroup.date}-${item.id}`
+                          }
+                          onToggle={() =>
+                            toggleItem(`${dayGroup.date}-${item.id}`)
+                          }
+                          quickMode={quickMode}
+                        />
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

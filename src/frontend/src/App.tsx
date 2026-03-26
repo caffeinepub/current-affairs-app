@@ -54,16 +54,6 @@ function formatDate(date: Date): string {
   });
 }
 
-const NAV_ITEMS: { label: string; page: Page; id: string }[] = [
-  { label: "Dashboard", page: "dashboard", id: "dashboard" },
-  { label: "Daily CA", page: "daily-ca", id: "daily_ca" },
-  { label: "Monthly CA", page: "monthly-ca", id: "monthly_ca" },
-  { label: "Mock Test", page: "mock-test", id: "mock_test" },
-  { label: "Performance", page: "performance", id: "performance" },
-  { label: "CA Quiz", page: "ca-quiz", id: "ca_quiz" },
-  { label: "Profile", page: "profile", id: "profile" },
-];
-
 const BOTTOM_NAV_ITEMS: {
   label: string;
   page: Page;
@@ -122,6 +112,138 @@ function MobileBottomNav({
   );
 }
 
+const CA_PAGES: Page[] = ["daily-ca", "monthly-ca", "ca-quiz"];
+
+function SidebarNav({
+  activePage,
+  setActivePage,
+  onNav,
+}: {
+  activePage: Page;
+  setActivePage: (p: Page) => void;
+  onNav?: () => void;
+}) {
+  const isCaActive = CA_PAGES.includes(activePage);
+
+  function nav(page: Page) {
+    setActivePage(page);
+    onNav?.();
+  }
+
+  const caSubItems: { label: string; page: Page; id: string }[] = [
+    { label: "Daily CA", page: "daily-ca", id: "daily_ca" },
+    { label: "Monthly CA", page: "monthly-ca", id: "monthly_ca" },
+    { label: "CA MCQs", page: "ca-quiz", id: "ca_quiz" },
+  ];
+
+  const comingSoon = ["PYQ Tests", "Syllabus", "Flashcards"];
+
+  return (
+    <div className="flex flex-col h-full py-3 gap-0.5">
+      <button
+        type="button"
+        onClick={() => nav("dashboard")}
+        className={`flex items-center gap-2.5 px-4 py-2.5 mx-2 rounded-lg text-sm font-medium transition-colors text-left ${
+          activePage === "dashboard"
+            ? "bg-primary/10 text-primary border-l-2 border-primary"
+            : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+        }`}
+        data-ocid="sidebar.dashboard.link"
+      >
+        <Home className="w-4 h-4 flex-shrink-0" />
+        Dashboard
+      </button>
+
+      <div
+        className={`mx-2 mt-1 rounded-lg overflow-hidden ${isCaActive ? "border border-primary/20 bg-primary/5" : ""}`}
+      >
+        <div
+          className={`flex items-center gap-2.5 px-4 py-2 text-xs font-semibold uppercase tracking-wider ${isCaActive ? "text-primary" : "text-muted-foreground"}`}
+        >
+          <Newspaper className="w-3.5 h-3.5 flex-shrink-0" />
+          Current Affairs
+        </div>
+        <div className="flex flex-col gap-0.5 pb-1.5">
+          {caSubItems.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => nav(item.page)}
+              className={`flex items-center gap-2 pl-8 pr-4 py-2 text-sm font-medium transition-colors text-left rounded-lg mx-1 ${
+                activePage === item.page
+                  ? "bg-primary/15 text-primary border-l-2 border-primary"
+                  : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+              }`}
+              data-ocid={`sidebar.${item.id}.link`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => nav("mock-test")}
+        className={`flex items-center gap-2.5 px-4 py-2.5 mx-2 rounded-lg text-sm font-medium transition-colors text-left ${
+          activePage === "mock-test"
+            ? "bg-primary/10 text-primary border-l-2 border-primary"
+            : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+        }`}
+        data-ocid="sidebar.mock_test.link"
+      >
+        <ClipboardList className="w-4 h-4 flex-shrink-0" />
+        Mock Tests
+      </button>
+
+      <button
+        type="button"
+        onClick={() => nav("performance")}
+        className={`flex items-center gap-2.5 px-4 py-2.5 mx-2 rounded-lg text-sm font-medium transition-colors text-left ${
+          activePage === "performance"
+            ? "bg-primary/10 text-primary border-l-2 border-primary"
+            : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+        }`}
+        data-ocid="sidebar.performance.link"
+      >
+        <Brain className="w-4 h-4 flex-shrink-0" />
+        Performance
+      </button>
+
+      <div className="mx-4 my-2 border-t border-border" />
+
+      {comingSoon.map((label) => (
+        <div
+          key={label}
+          className="flex items-center gap-2.5 px-4 py-2.5 mx-2 rounded-lg text-sm font-medium text-muted-foreground/40 cursor-not-allowed select-none"
+        >
+          <span className="w-4 h-4 flex-shrink-0" />
+          {label}
+          <span className="ml-auto text-[9px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded font-semibold uppercase tracking-wide">
+            Soon
+          </span>
+        </div>
+      ))}
+
+      <div className="mx-4 my-2 border-t border-border" />
+
+      <button
+        type="button"
+        onClick={() => nav("profile")}
+        className={`flex items-center gap-2.5 px-4 py-2.5 mx-2 rounded-lg text-sm font-medium transition-colors text-left ${
+          activePage === "profile"
+            ? "bg-primary/10 text-primary border-l-2 border-primary"
+            : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+        }`}
+        data-ocid="sidebar.profile.link"
+      >
+        <User className="w-4 h-4 flex-shrink-0" />
+        Profile
+      </button>
+    </div>
+  );
+}
+
 function AppShell({
   children,
   activePage,
@@ -135,15 +257,13 @@ function AppShell({
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* HEADER */}
       <header className="sticky top-0 z-30 bg-card border-b border-border shadow-nav">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
-          {/* Hamburger — mobile only */}
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
               <button
                 type="button"
-                className="sm:hidden p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                className="md:hidden p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
                 aria-label="Open menu"
                 data-ocid="nav.hamburger.button"
               >
@@ -160,26 +280,11 @@ function AppShell({
                   Current Affairs
                 </span>
               </div>
-              <nav className="flex flex-col py-2">
-                {NAV_ITEMS.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => {
-                      setActivePage(item.page);
-                      setSheetOpen(false);
-                    }}
-                    className={`flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors text-left ${
-                      activePage === item.page
-                        ? "bg-primary/10 text-primary border-l-2 border-primary"
-                        : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                    }`}
-                    data-ocid={`sheet_nav.${item.id}.link`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </nav>
+              <SidebarNav
+                activePage={activePage}
+                setActivePage={setActivePage}
+                onNav={() => setSheetOpen(false)}
+              />
             </SheetContent>
           </Sheet>
 
@@ -190,38 +295,21 @@ function AppShell({
             </span>
           </div>
 
-          {/* Desktop nav */}
-          <nav className="hidden sm:flex items-center gap-1">
-            {NAV_ITEMS.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setActivePage(item.page)}
-                className={`relative text-sm px-3 py-1.5 rounded-md cursor-pointer transition-colors bg-transparent border-0 font-medium ${
-                  activePage === item.page
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                }`}
-                data-ocid={`nav.${item.id}.link`}
-              >
-                {item.label}
-                {activePage === item.page && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full bg-primary" />
-                )}
-              </button>
-            ))}
-          </nav>
+          <div className="hidden md:block w-20" />
         </div>
       </header>
 
-      {/* MAIN */}
-      <main className="flex-1 pb-16 sm:pb-0">{children}</main>
+      <div className="flex flex-1">
+        <aside className="hidden md:flex flex-col w-56 border-r border-border bg-card fixed top-14 bottom-0 overflow-y-auto z-20">
+          <SidebarNav activePage={activePage} setActivePage={setActivePage} />
+        </aside>
+        <main className="flex-1 md:pl-56 pb-16 md:pb-0">{children}</main>
+      </div>
 
-      {/* FOOTER */}
-      <footer className="border-t border-border bg-card mt-auto hidden sm:block">
+      <footer className="border-t border-border bg-card hidden md:block">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Current Affairs App. All rights
+            &copy; {new Date().getFullYear()} Current Affairs App. All rights
             reserved.
           </span>
           <a

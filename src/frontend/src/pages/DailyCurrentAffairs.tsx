@@ -25,9 +25,11 @@ type CategoryFilter =
   | "All"
   | "National"
   | "International"
+  | "Economy"
   | "Legal"
   | "Awards"
   | "Sports";
+type ImportanceFilter = "All" | "Most Important" | "Exam Likely";
 
 const TIME_FILTERS: TimeFilter[] = [
   "Today",
@@ -39,6 +41,7 @@ const CATEGORIES: CategoryFilter[] = [
   "All",
   "National",
   "International",
+  "Economy",
   "Legal",
   "Awards",
   "Sports",
@@ -56,6 +59,20 @@ const ALL_DAYS = [
 ];
 
 const OPTION_LABELS = ["A", "B", "C", "D"];
+
+function simpleHash(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+function isImportant(item: NewsItem): boolean {
+  return item.category === "Legal" || simpleHash(item.id) % 5 === 0;
+}
+
+function isExamLikely(item: NewsItem): boolean {
+  return simpleHash(item.id) % 3 === 0;
+}
 
 function displayDate(dateStr: string): string {
   const [y, m, d] = dateStr.split("-").map(Number);
@@ -147,6 +164,8 @@ type AccordionRowProps = {
   isExpanded: boolean;
   onToggle: () => void;
   quickMode: boolean;
+  isImportantItem: boolean;
+  isExamLikelyItem: boolean;
 };
 
 function AccordionRow({
@@ -156,6 +175,8 @@ function AccordionRow({
   isExpanded,
   onToggle,
   quickMode,
+  isImportantItem,
+  isExamLikelyItem,
 }: AccordionRowProps) {
   return (
     <div
@@ -173,7 +194,7 @@ function AccordionRow({
           <p className="text-sm font-semibold text-foreground leading-snug">
             {item.title}
           </p>
-          <div className="flex items-center gap-2 mt-1.5">
+          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
             <span
               className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${getCategoryColor(item.category)} inline-block`}
             >
@@ -182,6 +203,16 @@ function AccordionRow({
             <span className="text-[11px] text-muted-foreground">
               {displayDate(dateStr)}
             </span>
+            {isImportantItem && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full border border-amber-500/30 text-amber-400 bg-amber-500/5">
+                ⭐
+              </span>
+            )}
+            {isExamLikelyItem && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full border border-blue-500/30 text-blue-400 bg-blue-500/5">
+                📘
+              </span>
+            )}
           </div>
         </div>
         <ChevronDown
@@ -204,6 +235,18 @@ function AccordionRow({
               <p className="text-sm text-muted-foreground leading-relaxed mb-0">
                 {item.summary}
               </p>
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                {isImportantItem && (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-amber-500/40 text-amber-400 bg-amber-500/10">
+                    ⭐ Most Important
+                  </span>
+                )}
+                {isExamLikelyItem && (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-blue-500/40 text-blue-400 bg-blue-500/10">
+                    📘 Exam Likely
+                  </span>
+                )}
+              </div>
               <MCQSection item={item} index={index} />
             </div>
           </motion.div>
@@ -239,6 +282,8 @@ function getWeekStart(): string {
 export function DailyCurrentAffairs() {
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("All Time");
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("All");
+  const [importanceFilter, setImportanceFilter] =
+    useState<ImportanceFilter>("All");
   const [dateOverride, setDateOverride] = useState("");
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
   const [quickMode, setQuickMode] = useState(false);
@@ -247,10 +292,16 @@ export function DailyCurrentAffairs() {
     if (dateOverride) {
       const day = ALL_DAYS.find((d) => d.date === dateOverride);
       if (!day) return [];
-      const news =
+      let news =
         categoryFilter === "All"
           ? day.news
           : day.news.filter((n) => n.category === categoryFilter);
+      if (quickMode)
+        news = news.filter((n) => isImportant(n) || isExamLikely(n));
+      else if (importanceFilter === "Most Important")
+        news = news.filter(isImportant);
+      else if (importanceFilter === "Exam Likely")
+        news = news.filter(isExamLikely);
       return news.length > 0 ? [{ date: day.date, news }] : [];
     }
 
@@ -271,14 +322,20 @@ export function DailyCurrentAffairs() {
     const sorted = [...days].sort((a, b) => (a.date > b.date ? -1 : 1));
     return sorted
       .map((day) => {
-        const news =
+        let news =
           categoryFilter === "All"
             ? day.news
             : day.news.filter((n) => n.category === categoryFilter);
+        if (quickMode)
+          news = news.filter((n) => isImportant(n) || isExamLikely(n));
+        else if (importanceFilter === "Most Important")
+          news = news.filter(isImportant);
+        else if (importanceFilter === "Exam Likely")
+          news = news.filter(isExamLikely);
         return { date: day.date, news };
       })
       .filter((g) => g.news.length > 0);
-  }, [timeFilter, categoryFilter, dateOverride]);
+  }, [timeFilter, categoryFilter, importanceFilter, dateOverride, quickMode]);
 
   function toggleItem(dateStr: string, id: string) {
     const key = `${dateStr}-${id}`;
@@ -360,7 +417,7 @@ export function DailyCurrentAffairs() {
       </div>
 
       {/* Category filter row */}
-      <div className="flex items-center gap-1.5 flex-wrap mb-5">
+      <div className="flex items-center gap-1.5 flex-wrap mb-3">
         {CATEGORIES.map((cat) => (
           <button
             key={cat}
@@ -378,6 +435,29 @@ export function DailyCurrentAffairs() {
         ))}
       </div>
 
+      {/* Importance filter pills row */}
+      <div className="flex items-center gap-1.5 flex-wrap mb-5">
+        {(["All", "Most Important", "Exam Likely"] as const).map((f) => (
+          <button
+            key={f}
+            type="button"
+            onClick={() => setImportanceFilter(f)}
+            className={`text-xs px-3.5 py-1.5 rounded-full border font-medium transition-colors flex items-center gap-1 ${
+              importanceFilter === f
+                ? "bg-primary text-primary-foreground border-primary"
+                : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
+            }`}
+            data-ocid={`daily_ca.importance_filter.${f.toLowerCase().replace(" ", "_")}`}
+          >
+            {f === "Most Important"
+              ? "⭐ Most Important"
+              : f === "Exam Likely"
+                ? "📘 Exam Likely"
+                : f}
+          </button>
+        ))}
+      </div>
+
       {/* Quick Revision banner */}
       <AnimatePresence>
         {quickMode && (
@@ -388,7 +468,8 @@ export function DailyCurrentAffairs() {
             className="mb-4 px-4 py-2.5 rounded-lg border text-xs text-primary flex items-center gap-2 bg-primary/10 border-primary/30"
           >
             <Zap className="w-3.5 h-3.5 flex-shrink-0" />
-            Quick Revision Mode \u2014 summaries and MCQs are hidden
+            Quick Revision Mode \u2014 showing only Most Important & Exam Likely
+            news
           </motion.div>
         )}
       </AnimatePresence>
@@ -476,6 +557,8 @@ function DateGroup({
               isExpanded={expandedKey === itemKey}
               onToggle={() => onToggle(date, item.id)}
               quickMode={quickMode}
+              isImportantItem={isImportant(item)}
+              isExamLikelyItem={isExamLikely(item)}
             />
           );
         })}
