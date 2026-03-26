@@ -1,22 +1,38 @@
 # Current Affairs App
 
 ## Current State
-MonthlyCurrentAffairs.tsx already has prev/next month navigation, category stat cards, Important Highlights section, category filter pills, and accordion news list grouped by day. The design exists but doesn't precisely match the reference screenshot.
+- MonthlyCurrentAffairs.tsx has a non-functional Download button (placeholder only)
+- Quick Revision toggle exists and works (shows only important/exam-likely news)
+- News cards are expandable with title, summary, category tag, key insight
+- Category filter pills and month navigation are implemented
 
 ## Requested Changes (Diff)
 
 ### Add
-- Nothing new
+- **Download as Image** functionality using `html2canvas` (or Canvas API)
+- Two download options:
+  1. **Download All** - captures all news for the current month as a long image
+  2. **Download Filtered** - captures only the currently filtered/quick revision news
+- Download generates a clean, shareable notes-style image:
+  - Dark background matching the app theme
+  - Month title header
+  - Each news item: title, category tag (color-coded), summary, key insight/explanation
+  - Footer: "TS LAWCET Current Affairs - [Month Year]"
+- Download button in header replaced with a dropdown showing both options
+- Quick Revision also works as download scope (if quick mode on, Filtered = only important/exam-likely)
 
 ### Modify
-- Category stat cards: Make numbers much larger/bolder (text-3xl+), display only 5 categories in a row (National, International, Legal, Awards, Sports -- remove Economy from stat cards row OR include it but ensure they fit in one row on desktop). Match screenshot: dark card bg, colored large number, category label below.
-- Important Highlights: Always show cards expanded by default (no toggle needed -- the subtitle 'One representative story per category' stays visible). Each highlight card: category colored badge top-left, bold title, 2-line summary visible without clicking.
-- Overall layout: Match the reference screenshot's clean dark aesthetic with proper card proportions.
+- Replace the existing placeholder Download button with a functional dropdown button
 
 ### Remove
 - Nothing
 
 ## Implementation Plan
-1. Update stat card grid to show all 6 categories (or match the 5 in screenshot) in a single row with large bold colored numbers.
-2. Make the Important Highlights section always show the news cards (keep the collapse toggle but default open and ensure cards show summary text without needing to click).
-3. Ensure the highlight cards match screenshot: colored category badge, bold title, truncated summary in muted text.
+1. Install `html2canvas` for image generation (or use Canvas API directly to avoid dependency)
+2. Create a `generateNotesImage(newsItems, monthLabel)` utility function that:
+   - Creates an off-screen canvas
+   - Draws a dark-themed notes layout (dark bg, white text, colored category badges)
+   - Each news item as a card: title bold, category pill, summary, explanation indented
+   - Saves as PNG download
+3. Add a download dropdown in MonthlyCurrentAffairs header with "Download All" and "Download Filtered"
+4. Wire both buttons to the image generator with respective news lists
