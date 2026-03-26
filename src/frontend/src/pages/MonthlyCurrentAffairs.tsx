@@ -432,7 +432,7 @@ export function MonthlyCurrentAffairs() {
         </button>
       </div>
 
-      {/* Category Stats Cards */}
+      {/* Category Stats Cards — 3 cols on mobile, 6 on sm+ */}
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-5">
         {CATEGORY_LIST.map((cat) => {
           const colors = STAT_CARD_COLORS[cat];
@@ -441,10 +441,10 @@ export function MonthlyCurrentAffairs() {
               key={cat}
               className={`${colors.bg} border ${colors.border} rounded-xl p-3 text-center`}
             >
-              <p className={`text-xl font-bold ${colors.count}`}>
+              <p className={`text-3xl font-bold ${colors.count} leading-none`}>
                 {categoryCounts[cat] ?? 0}
               </p>
-              <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight">
+              <p className="text-[10px] text-muted-foreground mt-1 leading-tight">
                 {cat}
               </p>
             </div>
@@ -506,11 +506,9 @@ export function MonthlyCurrentAffairs() {
                       <p className="text-sm font-semibold text-foreground leading-snug">
                         {item.title}
                       </p>
-                      {!quickMode && (
-                        <p className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-2">
-                          {item.summary}
-                        </p>
-                      )}
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-2">
+                        {item.summary}
+                      </p>
                     </div>
                   );
                 })}
