@@ -8,6 +8,7 @@ import { january2025Part2 } from "@/data/january2025Part2";
 import { march2025Part1 } from "@/data/march2025Part1";
 import { march2025Part2 } from "@/data/march2025Part2";
 import { may2025Part1 } from "@/data/may2025Part1";
+import { may2025Part2 } from "@/data/may2025Part2";
 import { getCategoryColor } from "@/lib/utils-ca";
 import jsPDF from "jspdf";
 import {
@@ -36,6 +37,7 @@ const ALL_DAYS: DayData[] = [
   ...april2025Part1,
   ...april2025Part2,
   ...may2025Part1,
+  ...may2025Part2,
 ];
 
 const AVAILABLE_MONTHS = [

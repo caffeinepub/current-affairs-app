@@ -29,7 +29,9 @@ import { march2025Part2 } from "../data/march2025Part2";
 import { march2025QuizPart1 } from "../data/march2025QuizPart1";
 import { march2025QuizPart2 } from "../data/march2025QuizPart2";
 import { may2025Part1 } from "../data/may2025Part1";
+import { may2025Part2 } from "../data/may2025Part2";
 import { may2025QuizPart1 } from "../data/may2025QuizPart1";
+import { may2025QuizPart2 } from "../data/may2025QuizPart2";
 
 type QuizQuestion = {
   newsTitle: string;
@@ -60,7 +62,8 @@ function buildQuestions(day: DayData): QuizQuestion[] {
       march2025QuizPart2.find((e) => e.newsId === news.id) ??
       april2025QuizPart1.find((e) => e.newsId === news.id) ??
       april2025QuizPart2.find((e) => e.newsId === news.id) ??
-      may2025QuizPart1.find((e) => e.newsId === news.id);
+      may2025QuizPart1.find((e) => e.newsId === news.id) ??
+      may2025QuizPart2.find((e) => e.newsId === news.id);
     if (extra) {
       questions.push({
         newsTitle: news.title,
@@ -114,6 +117,7 @@ export function CAQuiz({ onNavigateHome }: { onNavigateHome?: () => void }) {
       ...april2025Part1,
       ...april2025Part2,
       ...may2025Part1,
+      ...may2025Part2,
     ]) {
       loaded[day.date] = getStoredScore(day.date);
     }
@@ -183,6 +187,7 @@ export function CAQuiz({ onNavigateHome }: { onNavigateHome?: () => void }) {
             { label: "April 2025 (1–15)", days: april2025Part1 },
             { label: "April 2025 (16–30)", days: april2025Part2 },
             { label: "May 2025 (1–15)", days: may2025Part1 },
+            { label: "May 2025 (16–31)", days: may2025Part2 },
           ].map(({ label, days }) => (
             <div key={label} className="mb-6">
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
