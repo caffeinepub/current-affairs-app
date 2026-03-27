@@ -8,6 +8,7 @@ import type { NewsItem } from "@/data/january2025Part1";
 import { january2025Part2 } from "@/data/january2025Part2";
 import { march2025Part1 } from "@/data/march2025Part1";
 import { march2025Part2 } from "@/data/march2025Part2";
+import { may2025Part1 } from "@/data/may2025Part1";
 import { getCategoryColor } from "@/lib/utils-ca";
 import {
   BookOpen,
@@ -56,6 +57,7 @@ const ALL_DAYS = [
   ...march2025Part2,
   ...april2025Part1,
   ...april2025Part2,
+  ...may2025Part1,
 ];
 
 const OPTION_LABELS = ["A", "B", "C", "D"];

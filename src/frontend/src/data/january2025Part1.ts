@@ -9,6 +9,7 @@ export type NewsItem = {
   id: string;
   title: string;
   summary: string;
+  tags?: string[];
   category:
     | "Legal"
     | "National"
