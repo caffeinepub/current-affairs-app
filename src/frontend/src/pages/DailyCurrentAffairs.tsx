@@ -19,8 +19,7 @@ type CategoryFilter =
   | "International"
   | "Economy"
   | "Legal"
-  | "Awards"
-  | "Sports";
+  | "Awards/Sports";
 type ImportanceFilter = "All" | "Most Important" | "Exam Likely";
 
 const TIME_FILTERS: TimeFilter[] = [
@@ -35,8 +34,7 @@ const CATEGORIES: CategoryFilter[] = [
   "International",
   "Economy",
   "Legal",
-  "Awards",
-  "Sports",
+  "Awards/Sports",
 ];
 
 type DayData = { date: string; news: NewsItem[] };
@@ -330,7 +328,11 @@ export function DailyCurrentAffairs() {
       let news =
         categoryFilter === "All"
           ? day.news
-          : day.news.filter((n) => n.category === categoryFilter);
+          : day.news.filter((n) =>
+              categoryFilter === "Awards/Sports"
+                ? n.category === "Awards" || n.category === "Sports"
+                : n.category === categoryFilter,
+            );
       if (quickMode)
         news = news.filter((n) => isImportant(n) || isExamLikely(n));
       else if (importanceFilter === "Most Important")
@@ -360,7 +362,11 @@ export function DailyCurrentAffairs() {
         let news =
           categoryFilter === "All"
             ? day.news
-            : day.news.filter((n) => n.category === categoryFilter);
+            : day.news.filter((n) =>
+                categoryFilter === "Awards/Sports"
+                  ? n.category === "Awards" || n.category === "Sports"
+                  : n.category === categoryFilter,
+              );
         if (quickMode)
           news = news.filter((n) => isImportant(n) || isExamLikely(n));
         else if (importanceFilter === "Most Important")
@@ -459,7 +465,7 @@ export function DailyCurrentAffairs() {
             type="date"
             value={dateOverride}
             min="2025-01-01"
-            max="2025-04-30"
+            max="2025-07-31"
             onChange={(e) => {
               setDateOverride(e.target.value);
               setTimeFilter("All Time");
@@ -537,7 +543,7 @@ export function DailyCurrentAffairs() {
         >
           <p className="text-muted-foreground text-sm">
             {timeFilter === "Today"
-              ? "No content available for today. Content covers Jan 1 \u2013 Apr 30, 2025."
+              ? "No content available for today. Content covers Jan 1 \u2013 Jul 31, 2025."
               : "No content matches the selected filters."}
           </p>
           <p className="text-muted-foreground text-xs mt-1">

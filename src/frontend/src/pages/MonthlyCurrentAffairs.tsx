@@ -97,11 +97,11 @@ const CATEGORY_COLORS: Record<
     border: "border-pink-500/30",
     dot: "bg-pink-400",
   },
-  Sports: {
-    bg: "bg-teal-500/10",
-    text: "text-teal-400",
-    border: "border-teal-500/30",
-    dot: "bg-teal-400",
+  "Awards/Sports": {
+    bg: "bg-pink-500/10",
+    text: "text-pink-400",
+    border: "border-pink-500/30",
+    dot: "bg-pink-400",
   },
 };
 
@@ -134,10 +134,10 @@ const STAT_CARD_COLORS: Record<
     bg: "bg-pink-500/10",
     border: "border-pink-500/20",
   },
-  Sports: {
-    count: "text-teal-400",
-    bg: "bg-teal-500/10",
-    border: "border-teal-500/20",
+  "Awards/Sports": {
+    count: "text-pink-400",
+    bg: "bg-pink-500/10",
+    border: "border-pink-500/20",
   },
 };
 
@@ -146,8 +146,7 @@ const CATEGORY_LIST = [
   "International",
   "Economy",
   "Legal",
-  "Awards",
-  "Sports",
+  "Awards/Sports",
 ];
 
 // Canvas colors per category
@@ -157,7 +156,7 @@ const CAT_CANVAS_COLORS: Record<string, string> = {
   Economy: "#4ade80",
   Legal: "#fbbf24",
   Awards: "#f472b6",
-  Sports: "#2dd4bf",
+  "Awards/Sports": "#f472b6",
 };
 
 // PDF RGB colors per category
@@ -167,7 +166,7 @@ const CAT_PDF_COLORS: Record<string, [number, number, number]> = {
   Economy: [74, 222, 128],
   Legal: [251, 191, 36],
   Awards: [244, 114, 182],
-  Sports: [45, 212, 191],
+  "Awards/Sports": [244, 114, 182],
 };
 
 function simpleHash(s: string): number {
@@ -1057,7 +1056,11 @@ export function MonthlyCurrentAffairs() {
     const counts: Record<string, number> = {};
     for (const cat of CATEGORY_LIST) counts[cat] = 0;
     for (const item of monthNews) {
-      if (counts[item.category] !== undefined) counts[item.category]++;
+      const key =
+        item.category === "Awards" || item.category === "Sports"
+          ? "Awards/Sports"
+          : item.category;
+      if (counts[key] !== undefined) counts[key]++;
     }
     return counts;
   }, [monthNews]);
@@ -1083,7 +1086,12 @@ export function MonthlyCurrentAffairs() {
     for (const day of allDays ?? []) {
       if (day.date.startsWith(prefix)) {
         for (const item of day.news) {
-          if (categoryFilter === "All" || item.category === categoryFilter) {
+          if (
+            categoryFilter === "All" ||
+            item.category === categoryFilter ||
+            (categoryFilter === "Awards/Sports" &&
+              (item.category === "Awards" || item.category === "Sports"))
+          ) {
             withDates.push({ item, date: day.date });
           }
         }
