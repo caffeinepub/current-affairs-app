@@ -42,7 +42,7 @@ const CATEGORIES: CategoryFilter[] = [
 type DayData = { date: string; news: NewsItem[] };
 
 async function loadAllDays(): Promise<DayData[]> {
-  const [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13] =
+  const [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14] =
     await Promise.all([
       import("@/data/january2025Part1"),
       import("@/data/january2025Part2"),
@@ -57,6 +57,7 @@ async function loadAllDays(): Promise<DayData[]> {
       import("@/data/june2025Part1"),
       import("@/data/june2025Part2"),
       import("@/data/july2025Part1"),
+      import("@/data/july2025Part2"),
     ]);
   return [
     ...m1.january2025Part1,
@@ -72,6 +73,7 @@ async function loadAllDays(): Promise<DayData[]> {
     ...m11.june2025Part1,
     ...m12.june2025Part2,
     ...m13.july2025Part1,
+    ...m14.july2025Part2,
   ];
 }
 

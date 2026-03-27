@@ -91,6 +91,7 @@ async function loadAllData(): Promise<DayData[]> {
     import("../data/june2025Part1"),
     import("../data/june2025Part2"),
     import("../data/july2025Part1"),
+    import("../data/july2025Part2"),
   ]);
   return [
     ...modules[0].january2025Part1,
@@ -106,6 +107,7 @@ async function loadAllData(): Promise<DayData[]> {
     ...modules[10].june2025Part1,
     ...modules[11].june2025Part2,
     ...modules[12].july2025Part1,
+    ...modules[13].july2025Part2,
   ];
 }
 
