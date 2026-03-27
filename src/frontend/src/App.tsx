@@ -12,6 +12,7 @@ import {
   Flame,
   Home,
   Loader2,
+  LogOut,
   Menu,
   Newspaper,
   User,
@@ -245,6 +246,23 @@ function SidebarNav({
   );
 }
 
+function getInitials(
+  displayName?: string | null,
+  email?: string | null,
+): string {
+  if (displayName) {
+    const parts = displayName.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return parts[0][0].toUpperCase();
+  }
+  if (email) {
+    return email[0].toUpperCase();
+  }
+  return "U";
+}
+
 function AppShell({
   children,
   activePage,
@@ -255,6 +273,11 @@ function AppShell({
   setActivePage: (p: Page) => void;
 }) {
   const [sheetOpen, setSheetOpen] = useState(false);
+  const { user, logout } = useAuth();
+
+  const initials = getInitials(user?.displayName, user?.email);
+  const displayName = user?.displayName || user?.email?.split("@")[0] || "";
+  const email = user?.email || "";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -296,7 +319,39 @@ function AppShell({
             </span>
           </div>
 
-          <div className="hidden md:block w-20" />
+          {/* Header right: user info + logout */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Avatar circle */}
+            <div
+              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
+              style={{ background: "oklch(0.55 0.16 185)" }}
+              aria-label={displayName}
+            >
+              {initials}
+            </div>
+
+            {/* Name + email — desktop only */}
+            <div className="hidden md:flex flex-col leading-tight max-w-[180px]">
+              <span className="text-sm font-semibold text-foreground truncate">
+                {displayName}
+              </span>
+              <span className="text-xs text-muted-foreground truncate">
+                {email}
+              </span>
+            </div>
+
+            {/* Logout button */}
+            <button
+              type="button"
+              onClick={() => logout()}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors border border-border"
+              data-ocid="nav.logout.button"
+              aria-label="Logout"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
+          </div>
         </div>
       </header>
 

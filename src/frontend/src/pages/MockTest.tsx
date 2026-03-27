@@ -92,6 +92,7 @@ async function loadAllData(): Promise<DayData[]> {
     import("../data/june2025Part2"),
     import("../data/july2025Part1"),
     import("../data/july2025Part2"),
+    import("../data/august2025Part1"),
   ]);
   return [
     ...modules[0].january2025Part1,
@@ -108,6 +109,7 @@ async function loadAllData(): Promise<DayData[]> {
     ...modules[11].june2025Part2,
     ...modules[12].july2025Part1,
     ...modules[13].july2025Part2,
+    ...modules[14].august2025Part1,
   ];
 }
 
@@ -205,11 +207,6 @@ export function MockTest({ onNavigateHome }: { onNavigateHome?: () => void }) {
     }
     document.addEventListener("fullscreenchange", onFsChange);
     return () => document.removeEventListener("fullscreenchange", onFsChange);
-  }, []);
-
-  // Enter fullscreen on mount
-  useEffect(() => {
-    document.documentElement.requestFullscreen().catch(() => {});
   }, []);
 
   const handleEnterFullscreen = useCallback(() => {

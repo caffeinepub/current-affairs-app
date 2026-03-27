@@ -1,30 +1,33 @@
 # Current Affairs App
 
 ## Current State
-- Performance.tsx has a hardcoded `TEST_HISTORY` array with 10 fake test entries and derived fake stats
-- MockTest.tsx has a hardcoded `QUESTIONS` array with 25 fake/placeholder questions not from real CA data
-- App.tsx sidebar shows "PYQ Tests", "Syllabus", "Flashcards" as "Coming Soon" items
-- All 14 data files (Jan–Jul 2025, plus quiz extras) are statically imported at the top of DailyCurrentAffairs.tsx, CAQuiz.tsx, and MonthlyCurrentAffairs.tsx — this causes slow initial load as the entire bundle is huge
+App uses a dark NTA CBT theme (deep navy/dark background, blue accent). Header shows only logo. No profile info in the header. Logout is in the Profile page.
 
 ## Requested Changes (Diff)
 
 ### Add
-- Empty state in Performance.tsx: "No tests attempted yet. Complete a Mock Test or CA Quiz to see your performance here." with an icon, centered, clean dark-themed card
-- MockTest now builds its question pool from the real CA news MCQ data (same data source as CAQuiz) — randomly sample 50 questions from across all months for each test session
+- User avatar (colored circle with initials) in top-right of header
+- User name and email displayed beside the avatar in the header
+- Logout button in the header (top-right)
 
 ### Modify
-- Performance.tsx: replace `TEST_HISTORY`, derived stats, and stat cards with empty state UI
-- MockTest.tsx: replace fake `QUESTIONS` array with dynamic question pool built from the real CA data (all DayData arrays merged, then each news item's MCQ extracted, shuffled, and capped at 50 per session)
-- App.tsx: remove "PYQ Tests" from `comingSoon` array; keep "Syllabus" and "Flashcards" if desired but remove PYQ entirely from sidebar render
-- DailyCurrentAffairs.tsx, CAQuiz.tsx, MonthlyCurrentAffairs.tsx: change static top-level imports to lazy loading via useEffect + dynamic import() to reduce initial bundle size and load time
+- Switch from dark theme to light/white theme matching reference screenshot:
+  - White/light gray background
+  - White cards with subtle borders and shadows
+  - Dark text on light background
+  - Blue primary accent (same hue, adjusted for light mode)
+  - Light sidebar with dark text and blue active highlight
+  - Light gray input backgrounds
+- Header: white background, light border, logo on left, user info + logout on right
+- Sidebar: white/light background, active item has blue pill highlight
+- Category pills and badges: adapt to light theme (same colors, light backgrounds)
 
 ### Remove
-- Fake `TEST_HISTORY` array and all derived constants in Performance.tsx
-- Fake `QUESTIONS` array in MockTest.tsx
-- "PYQ Tests" from sidebar comingSoon list in App.tsx
+- Nothing removed
 
 ## Implementation Plan
-1. **Performance.tsx**: Delete TEST_HISTORY, all derived vars (totalAttempted, overallAccuracy, bestPct, bestEntry, lastEntry, lastPct, STAT_CARDS), replace component body with empty state card
-2. **MockTest.tsx**: Remove `QUESTIONS` array; add imports for all DayData arrays; add `buildMockQuestions()` function that flattens all days → all news → MCQ → shuffle → take first 50; wire into existing CBT test UI
-3. **App.tsx**: Remove "PYQ Tests" from comingSoon array
-4. **Data loading**: In DailyCurrentAffairs, CAQuiz, MonthlyCurrentAffairs — replace top-level static data imports with a single shared `useAllData` hook or inline `useEffect` that loads via dynamic import, sets state once loaded, and shows a skeleton/spinner while loading. This splits the data out of the main bundle chunk.
+1. Update `index.css` OKLCH tokens to light theme (white background, dark foreground, blue primary)
+2. Update `AppShell` header in `App.tsx` to add user avatar (initials), name, email, and Logout button on the right side
+3. Add `useAuth` hook usage in `AppShell` to get user info and logout function
+4. Ensure `input[type="date"]` color-scheme changed to `light`
+5. Ensure sidebar and all page components look correct in light mode (they use semantic tokens so should work automatically)

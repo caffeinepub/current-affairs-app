@@ -42,6 +42,7 @@ async function loadAllQuizData(): Promise<{
     m12,
     m13,
     m14,
+    m15,
     q1,
     q2,
     q3,
@@ -56,6 +57,7 @@ async function loadAllQuizData(): Promise<{
     q12,
     q13,
     q14,
+    q15,
   ] = await Promise.all([
     import("../data/january2025Part1"),
     import("../data/january2025Part2"),
@@ -71,6 +73,7 @@ async function loadAllQuizData(): Promise<{
     import("../data/june2025Part2"),
     import("../data/july2025Part1"),
     import("../data/july2025Part2"),
+    import("../data/august2025Part1"),
     import("../data/january2025QuizExtra"),
     import("../data/january2025QuizExtraPart2"),
     import("../data/february2025QuizExtra"),
@@ -85,6 +88,7 @@ async function loadAllQuizData(): Promise<{
     import("../data/june2025QuizPart2"),
     import("../data/july2025QuizPart1"),
     import("../data/july2025QuizPart2"),
+    import("../data/august2025QuizPart1"),
   ]);
   const days: DayData[] = [
     ...m1.january2025Part1,
@@ -101,6 +105,7 @@ async function loadAllQuizData(): Promise<{
     ...m12.june2025Part2,
     ...m13.july2025Part1,
     ...m14.july2025Part2,
+    ...m15.august2025Part1,
   ];
   const extras: QuizExtra[] = [
     ...q1.january2025QuizExtra,
@@ -117,6 +122,7 @@ async function loadAllQuizData(): Promise<{
     ...q12.june2025QuizPart2,
     ...q13.july2025QuizPart1,
     ...q14.july2025QuizPart2,
+    ...q15.august2025QuizPart1,
   ];
   return { days, extras };
 }

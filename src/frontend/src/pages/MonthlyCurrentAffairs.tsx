@@ -18,7 +18,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 type DayData = { date: string; news: NewsItem[] };
 
 async function loadAllDays(): Promise<DayData[]> {
-  const [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14] =
+  const [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15] =
     await Promise.all([
       import("@/data/january2025Part1"),
       import("@/data/january2025Part2"),
@@ -34,6 +34,7 @@ async function loadAllDays(): Promise<DayData[]> {
       import("@/data/june2025Part2"),
       import("@/data/july2025Part1"),
       import("@/data/july2025Part2"),
+      import("@/data/august2025Part1"),
     ]);
   return [
     ...m1.january2025Part1,
@@ -50,6 +51,7 @@ async function loadAllDays(): Promise<DayData[]> {
     ...m12.june2025Part2,
     ...m13.july2025Part1,
     ...m14.july2025Part2,
+    ...m15.august2025Part1,
   ];
 }
 
@@ -61,6 +63,7 @@ const AVAILABLE_MONTHS = [
   { year: 2025, month: 5, label: "May 2025" },
   { year: 2025, month: 6, label: "June 2025" },
   { year: 2025, month: 7, label: "July 2025" },
+  { year: 2025, month: 8, label: "August 2025" },
 ];
 
 const CATEGORY_COLORS: Record<

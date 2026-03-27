@@ -22,56 +22,56 @@
   :root {
     --radius: 0.625rem;
 
-    /* Dark NTA CBT theme */
-    --background: 0.12 0.03 245;
-    --foreground: 0.92 0.005 245;
-    --card: 0.17 0.025 245;
-    --card-foreground: 0.92 0.005 245;
-    --popover: 0.17 0.025 245;
-    --popover-foreground: 0.92 0.005 245;
+    /* Light theme */
+    --background: 0.97 0.005 245;
+    --foreground: 0.15 0.02 245;
+    --card: 1.0 0 0;
+    --card-foreground: 0.15 0.02 245;
+    --popover: 1.0 0 0;
+    --popover-foreground: 0.15 0.02 245;
 
-    /* NTA Blue as primary */
-    --primary: 0.58 0.2 255;
+    /* Blue primary */
+    --primary: 0.52 0.22 255;
     --primary-foreground: 0.98 0 0;
 
-    --secondary: 0.2 0.025 245;
-    --secondary-foreground: 0.92 0.005 245;
+    --secondary: 0.93 0.008 245;
+    --secondary-foreground: 0.15 0.02 245;
 
-    --muted: 0.2 0.025 245;
-    --muted-foreground: 0.5 0.02 245;
+    --muted: 0.93 0.008 245;
+    --muted-foreground: 0.5 0.015 245;
 
-    --accent: 0.65 0.16 185;
+    --accent: 0.55 0.16 185;
     --accent-foreground: 0.98 0 0;
 
-    --destructive: 0.58 0.22 27;
+    --destructive: 0.55 0.22 27;
     --destructive-foreground: 0.98 0 0;
 
-    --border: 0.25 0.02 245;
-    --input: 0.25 0.02 245;
-    --ring: 0.58 0.2 255;
+    --border: 0.88 0.01 245;
+    --input: 0.88 0.01 245;
+    --ring: 0.52 0.22 255;
 
     /* Custom semantic tokens */
-    --teal: 0.65 0.16 185;
+    --teal: 0.55 0.16 185;
     --teal-light: 0.75 0.12 185;
-    --success: 0.65 0.18 160;
-    --warning: 0.72 0.18 60;
+    --success: 0.55 0.18 160;
+    --warning: 0.62 0.18 60;
 
     /* Charts */
-    --chart-1: 0.58 0.2 255;
-    --chart-2: 0.65 0.18 160;
-    --chart-3: 0.72 0.18 60;
-    --chart-4: 0.58 0.22 27;
-    --chart-5: 0.65 0.16 185;
+    --chart-1: 0.52 0.22 255;
+    --chart-2: 0.55 0.18 160;
+    --chart-3: 0.62 0.18 60;
+    --chart-4: 0.55 0.22 27;
+    --chart-5: 0.55 0.16 185;
 
     /* Sidebar */
-    --sidebar: 0.14 0.028 245;
-    --sidebar-foreground: 0.92 0.005 245;
-    --sidebar-primary: 0.58 0.2 255;
+    --sidebar: 1.0 0 0;
+    --sidebar-foreground: 0.15 0.02 245;
+    --sidebar-primary: 0.52 0.22 255;
     --sidebar-primary-foreground: 0.98 0 0;
-    --sidebar-accent: 0.2 0.025 245;
-    --sidebar-accent-foreground: 0.92 0.005 245;
-    --sidebar-border: 0.25 0.02 245;
-    --sidebar-ring: 0.58 0.2 255;
+    --sidebar-accent: 0.93 0.008 245;
+    --sidebar-accent-foreground: 0.15 0.02 245;
+    --sidebar-border: 0.88 0.01 245;
+    --sidebar-ring: 0.52 0.22 255;
   }
 
   * {
@@ -81,10 +81,10 @@
   body {
     @apply bg-background text-foreground;
     font-family: "General Sans", "Plus Jakarta Sans", system-ui, sans-serif;
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   input[type="date"] {
-    color-scheme: dark;
+    color-scheme: light;
   }
 }
