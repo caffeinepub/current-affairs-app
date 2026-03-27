@@ -137,7 +137,7 @@ function SidebarNav({
     { label: "CA MCQs", page: "ca-quiz", id: "ca_quiz" },
   ];
 
-  const comingSoon = ["PYQ Tests", "Syllabus", "Flashcards"];
+  const comingSoon = ["Syllabus", "Flashcards"];
 
   return (
     <div className="flex flex-col h-full py-3 gap-0.5">

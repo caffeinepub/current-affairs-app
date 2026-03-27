@@ -1,38 +1,30 @@
 # Current Affairs App
 
 ## Current State
-- MonthlyCurrentAffairs.tsx has a non-functional Download button (placeholder only)
-- Quick Revision toggle exists and works (shows only important/exam-likely news)
-- News cards are expandable with title, summary, category tag, key insight
-- Category filter pills and month navigation are implemented
+- Performance.tsx has a hardcoded `TEST_HISTORY` array with 10 fake test entries and derived fake stats
+- MockTest.tsx has a hardcoded `QUESTIONS` array with 25 fake/placeholder questions not from real CA data
+- App.tsx sidebar shows "PYQ Tests", "Syllabus", "Flashcards" as "Coming Soon" items
+- All 14 data files (Jan–Jul 2025, plus quiz extras) are statically imported at the top of DailyCurrentAffairs.tsx, CAQuiz.tsx, and MonthlyCurrentAffairs.tsx — this causes slow initial load as the entire bundle is huge
 
 ## Requested Changes (Diff)
 
 ### Add
-- **Download as Image** functionality using `html2canvas` (or Canvas API)
-- Two download options:
-  1. **Download All** - captures all news for the current month as a long image
-  2. **Download Filtered** - captures only the currently filtered/quick revision news
-- Download generates a clean, shareable notes-style image:
-  - Dark background matching the app theme
-  - Month title header
-  - Each news item: title, category tag (color-coded), summary, key insight/explanation
-  - Footer: "TS LAWCET Current Affairs - [Month Year]"
-- Download button in header replaced with a dropdown showing both options
-- Quick Revision also works as download scope (if quick mode on, Filtered = only important/exam-likely)
+- Empty state in Performance.tsx: "No tests attempted yet. Complete a Mock Test or CA Quiz to see your performance here." with an icon, centered, clean dark-themed card
+- MockTest now builds its question pool from the real CA news MCQ data (same data source as CAQuiz) — randomly sample 50 questions from across all months for each test session
 
 ### Modify
-- Replace the existing placeholder Download button with a functional dropdown button
+- Performance.tsx: replace `TEST_HISTORY`, derived stats, and stat cards with empty state UI
+- MockTest.tsx: replace fake `QUESTIONS` array with dynamic question pool built from the real CA data (all DayData arrays merged, then each news item's MCQ extracted, shuffled, and capped at 50 per session)
+- App.tsx: remove "PYQ Tests" from `comingSoon` array; keep "Syllabus" and "Flashcards" if desired but remove PYQ entirely from sidebar render
+- DailyCurrentAffairs.tsx, CAQuiz.tsx, MonthlyCurrentAffairs.tsx: change static top-level imports to lazy loading via useEffect + dynamic import() to reduce initial bundle size and load time
 
 ### Remove
-- Nothing
+- Fake `TEST_HISTORY` array and all derived constants in Performance.tsx
+- Fake `QUESTIONS` array in MockTest.tsx
+- "PYQ Tests" from sidebar comingSoon list in App.tsx
 
 ## Implementation Plan
-1. Install `html2canvas` for image generation (or use Canvas API directly to avoid dependency)
-2. Create a `generateNotesImage(newsItems, monthLabel)` utility function that:
-   - Creates an off-screen canvas
-   - Draws a dark-themed notes layout (dark bg, white text, colored category badges)
-   - Each news item as a card: title bold, category pill, summary, explanation indented
-   - Saves as PNG download
-3. Add a download dropdown in MonthlyCurrentAffairs header with "Download All" and "Download Filtered"
-4. Wire both buttons to the image generator with respective news lists
+1. **Performance.tsx**: Delete TEST_HISTORY, all derived vars (totalAttempted, overallAccuracy, bestPct, bestEntry, lastEntry, lastPct, STAT_CARDS), replace component body with empty state card
+2. **MockTest.tsx**: Remove `QUESTIONS` array; add imports for all DayData arrays; add `buildMockQuestions()` function that flattens all days → all news → MCQ → shuffle → take first 50; wire into existing CBT test UI
+3. **App.tsx**: Remove "PYQ Tests" from comingSoon array
+4. **Data loading**: In DailyCurrentAffairs, CAQuiz, MonthlyCurrentAffairs — replace top-level static data imports with a single shared `useAllData` hook or inline `useEffect` that loads via dynamic import, sets state once loaded, and shows a skeleton/spinner while loading. This splits the data out of the main bundle chunk.

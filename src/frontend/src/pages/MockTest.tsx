@@ -66,6 +66,8 @@ const QuestionPaletteButtonLg = memo(function QuestionPaletteButtonLg({
   );
 });
 
+import type { DayData } from "../data/january2025Part1";
+
 type Question = {
   id: number;
   question: string;
@@ -74,457 +76,61 @@ type Question = {
   topic: string;
 };
 
-const QUESTIONS: Question[] = [
-  {
-    id: 1,
-    question:
-      "India's Union Budget 2025-26 proposed which key initiative for rural employment?",
-    options: [
-      "MGNREGS expansion to 200 days",
-      "PM-KISAN doubling to ₹12,000/year",
-      "National Rural Livelihood Mission relaunch",
-      "Agricultural Infrastructure Fund extension",
-    ],
-    correct: 1,
-    topic: "Economy",
-  },
-  {
-    id: 2,
-    question: "Which country joined BRICS as a full member in January 2025?",
-    options: ["Turkey", "Saudi Arabia", "Indonesia", "Argentina"],
-    correct: 1,
-    topic: "International",
-  },
-  {
-    id: 3,
-    question:
-      "India's first hyperloop test track was inaugurated in which state in 2025?",
-    options: ["Maharashtra", "Karnataka", "Telangana", "Gujarat"],
-    correct: 3,
-    topic: "Technology",
-  },
-  {
-    id: 4,
-    question:
-      "The Bharat AI Mission 2025 allocated how much funding for AI infrastructure?",
-    options: [
-      "₹5,000 crore",
-      "₹10,371 crore",
-      "₹15,000 crore",
-      "₹20,000 crore",
-    ],
-    correct: 1,
-    topic: "Technology",
-  },
-  {
-    id: 5,
-    question:
-      "Which Indian satellite was launched to study solar wind in 2025?",
-    options: ["Aditya-L2", "IRNSS-1J", "RISAT-3", "Chandrayaan-4"],
-    correct: 0,
-    topic: "Science",
-  },
-  {
-    id: 6,
-    question:
-      "India ranked at which position in the Global Innovation Index 2025?",
-    options: ["35th", "39th", "42nd", "47th"],
-    correct: 1,
-    topic: "Economy",
-  },
-  {
-    id: 7,
-    question:
-      "The UN Climate Conference COP30 (2025) was held in which country?",
-    options: ["Brazil", "Egypt", "UAE", "India"],
-    correct: 0,
-    topic: "Environment",
-  },
-  {
-    id: 8,
-    question:
-      "India's GDP growth for FY2025-26 was projected at what rate by IMF?",
-    options: ["5.9%", "6.5%", "7.2%", "8.0%"],
-    correct: 1,
-    topic: "Economy",
-  },
-  {
-    id: 9,
-    question:
-      "The Women's Reservation Bill reserves what percentage of seats in Parliament?",
-    options: ["25%", "30%", "33%", "40%"],
-    correct: 2,
-    topic: "Politics",
-  },
-  {
-    id: 10,
-    question: "India won how many medals at the 2024 Paris Olympics?",
-    options: ["4", "6", "8", "10"],
-    correct: 1,
-    topic: "Sports",
-  },
-  {
-    id: 11,
-    question:
-      "Which mission aims to send Indian astronauts to the Moon by 2040?",
-    options: [
-      "Chandrayaan-4",
-      "Gaganyaan Plus",
-      "Project Bharatiya",
-      "Lunar India Mission",
-    ],
-    correct: 0,
-    topic: "Science",
-  },
-  {
-    id: 12,
-    question:
-      "The India-Middle East-Europe Economic Corridor (IMEC) was announced at which summit?",
-    options: ["COP28", "G20 New Delhi", "ASEAN 2023", "G7 Hiroshima"],
-    correct: 1,
-    topic: "International",
-  },
-  {
-    id: 13,
-    question: "India's first green hydrogen hub was established in which city?",
-    options: ["Surat", "Visakhapatnam", "Kochi", "Mangaluru"],
-    correct: 1,
-    topic: "Environment",
-  },
-  {
-    id: 14,
-    question:
-      "The Vande Bharat Express network target by 2026 is how many trains?",
-    options: ["100", "200", "300", "400"],
-    correct: 3,
-    topic: "Technology",
-  },
-  {
-    id: 15,
-    question:
-      "Which Indian state became first to achieve 100% natural farming districts?",
-    options: ["Sikkim", "Uttarakhand", "Himachal Pradesh", "Arunachal Pradesh"],
-    correct: 0,
-    topic: "Environment",
-  },
-  {
-    id: 16,
-    question:
-      "The One Nation One Election proposal covers which elections simultaneously?",
-    options: [
-      "Lok Sabha and Rajya Sabha",
-      "Lok Sabha and State Assemblies",
-      "All three tiers",
-      "State Assemblies only",
-    ],
-    correct: 1,
-    topic: "Politics",
-  },
-  {
-    id: 17,
-    question:
-      "India's first underwater metro became operational in which city in 2024?",
-    options: ["Mumbai", "Kolkata", "Chennai", "Bengaluru"],
-    correct: 1,
-    topic: "Technology",
-  },
-  {
-    id: 18,
-    question: "The WHO declared what as a global health emergency in 2024?",
-    options: [
-      "Nipah Virus",
-      "Mpox (Monkeypox)",
-      "Bird Flu H5N1",
-      "Dengue fever",
-    ],
-    correct: 1,
-    topic: "Science",
-  },
-  {
-    id: 19,
-    question:
-      "India's Chandrayaan-3 made history by landing near which lunar region?",
-    options: ["North Pole", "Equator", "South Pole", "Mare Imbrium"],
-    correct: 2,
-    topic: "Science",
-  },
-  {
-    id: 20,
-    question:
-      "The Digital Personal Data Protection Act was passed in which year?",
-    options: ["2022", "2023", "2024", "2025"],
-    correct: 1,
-    topic: "Technology",
-  },
-  {
-    id: 21,
-    question:
-      "India became the world's most populous country, surpassing China in which year?",
-    options: ["2022", "2023", "2024", "2025"],
-    correct: 1,
-    topic: "International",
-  },
-  {
-    id: 22,
-    question:
-      "PM Vishwakarma Yojana targets artisans from how many traditional trades?",
-    options: ["10", "15", "18", "24"],
-    correct: 2,
-    topic: "Economy",
-  },
-  {
-    id: 23,
-    question:
-      "The Nari Shakti Vandan Adhiniyam will take effect after what condition?",
-    options: [
-      "Presidential assent",
-      "Supreme Court order",
-      "Delimitation exercise",
-      "State ratification",
-    ],
-    correct: 2,
-    topic: "Politics",
-  },
-  {
-    id: 24,
-    question: "India hosted the SCO Summit 2023 in which mode?",
-    options: [
-      "Physical in Goa",
-      "Virtual",
-      "Physical in New Delhi",
-      "Physical in Varanasi",
-    ],
-    correct: 1,
-    topic: "International",
-  },
-  {
-    id: 25,
-    question: "Which Indian archer won gold at the 2024 Paris Olympics?",
-    options: [
-      "Deepika Kumari",
-      "Neeraj Chopra",
-      "Pravin Jadhav",
-      "Tarundeep Rai",
-    ],
-    correct: 0,
-    topic: "Sports",
-  },
-  {
-    id: 26,
-    question: "The Agnipath scheme enrolls short-term soldiers called:",
-    options: ["Sainiks", "Agniveers", "Jawans", "Senapatis"],
-    correct: 1,
-    topic: "Politics",
-  },
-  {
-    id: 27,
-    question: "India's National Quantum Mission has a budget of:",
-    options: ["₹3,000 crore", "₹6,003 crore", "₹10,000 crore", "₹15,000 crore"],
-    correct: 1,
-    topic: "Science",
-  },
-  {
-    id: 28,
-    question:
-      "Which country launched the world's first fully reusable commercial spaceplane in 2024?",
-    options: ["USA", "China", "Russia", "India"],
-    correct: 1,
-    topic: "Science",
-  },
-  {
-    id: 29,
-    question:
-      "The 'Fit India' Movement was launched by PM Modi on National Sports Day in:",
-    options: ["2018", "2019", "2020", "2021"],
-    correct: 1,
-    topic: "Sports",
-  },
-  {
-    id: 30,
-    question: "India's exports target for 2030 is set at:",
-    options: ["$1 trillion", "$2 trillion", "$3 trillion", "$5 trillion"],
-    correct: 0,
-    topic: "Economy",
-  },
-  {
-    id: 31,
-    question: "The 50th G7 Summit in 2024 was hosted by which country?",
-    options: ["USA", "France", "Italy", "Japan"],
-    correct: 2,
-    topic: "International",
-  },
-  {
-    id: 32,
-    question:
-      "India's UPI registered transactions of over how many billion in FY2024-25?",
-    options: ["50 billion", "100 billion", "172 billion", "200 billion"],
-    correct: 2,
-    topic: "Technology",
-  },
-  {
-    id: 33,
-    question: "ISRO's SpaDeX mission tested which technology in 2025?",
-    options: [
-      "Lunar landing",
-      "Space docking",
-      "Mars orbit insertion",
-      "Solar sail deployment",
-    ],
-    correct: 1,
-    topic: "Science",
-  },
-  {
-    id: 34,
-    question:
-      "India's forest cover as per State of Forest Report 2023 stands at approximately:",
-    options: ["19%", "21%", "24%", "27%"],
-    correct: 2,
-    topic: "Environment",
-  },
-  {
-    id: 35,
-    question: "The Global Biofuels Alliance was launched by India during:",
-    options: [
-      "COP28",
-      "G20 New Delhi Summit",
-      "ASEAN Summit 2023",
-      "QUAD meeting 2024",
-    ],
-    correct: 1,
-    topic: "Environment",
-  },
-  {
-    id: 36,
-    question:
-      "India's 'Lakhpati Didi' scheme targets how many rural women entrepreneurs?",
-    options: ["1 crore", "2 crore", "3 crore", "5 crore"],
-    correct: 2,
-    topic: "Economy",
-  },
-  {
-    id: 37,
-    question:
-      "The Amrit Bharat Station Scheme aims to redevelop how many railway stations?",
-    options: ["508", "1,275", "1,957", "2,400"],
-    correct: 1,
-    topic: "Technology",
-  },
-  {
-    id: 38,
-    question:
-      "India became the 4th country to achieve soft-landing on the Moon with:",
-    options: ["Chandrayaan-2", "Chandrayaan-3", "Gaganyaan", "Aditya-L1"],
-    correct: 1,
-    topic: "Science",
-  },
-  {
-    id: 39,
-    question:
-      "The 18th Lok Sabha elections were held in how many phases in 2024?",
-    options: ["5", "6", "7", "8"],
-    correct: 2,
-    topic: "Politics",
-  },
-  {
-    id: 40,
-    question: "India's first AI university was established in which state?",
-    options: ["Karnataka", "Telangana", "Maharashtra", "Tamil Nadu"],
-    correct: 1,
-    topic: "Technology",
-  },
-  {
-    id: 41,
-    question:
-      "The Paris Agreement aims to limit global temperature rise to within:",
-    options: ["1°C", "1.5°C", "2°C", "2.5°C"],
-    correct: 1,
-    topic: "Environment",
-  },
-  {
-    id: 42,
-    question: "India hosted the ICC Men's T20 World Cup 2024 jointly with:",
-    options: ["England", "South Africa", "West Indies", "USA"],
-    correct: 3,
-    topic: "Sports",
-  },
-  {
-    id: 43,
-    question:
-      "The SEBI tightened F&O regulations in 2024 primarily to protect:",
-    options: [
-      "Institutional investors",
-      "Retail investors",
-      "Foreign portfolio investors",
-      "Mutual funds",
-    ],
-    correct: 1,
-    topic: "Economy",
-  },
-  {
-    id: 44,
-    question: "India's Defence budget for FY2025-26 was approximately:",
-    options: [
-      "₹4.5 lakh crore",
-      "₹6.2 lakh crore",
-      "₹7.5 lakh crore",
-      "₹8.0 lakh crore",
-    ],
-    correct: 1,
-    topic: "Politics",
-  },
-  {
-    id: 45,
-    question:
-      "Which Indian won the Nobel Peace Prize in recent years for microfinance work?",
-    options: [
-      "Amartya Sen",
-      "Muhammad Yunus",
-      "Kailash Satyarthi",
-      "No Indian",
-    ],
-    correct: 2,
-    topic: "International",
-  },
-  {
-    id: 46,
-    question:
-      "India's 'Operation Sindoor' in 2025 targeted terrorist infrastructure in:",
-    options: ["Afghanistan", "Bangladesh", "Pakistan and PoK", "Sri Lanka"],
-    correct: 2,
-    topic: "Politics",
-  },
-  {
-    id: 47,
-    question:
-      "The first India-made semiconductor chip was fabricated by which company in 2025?",
-    options: ["Tata Electronics", "ISMC", "Vedanta-Foxconn", "Micron India"],
-    correct: 0,
-    topic: "Technology",
-  },
-  {
-    id: 48,
-    question:
-      "India's National Education Policy 2020 mandates mother tongue instruction up to which grade?",
-    options: ["Grade 3", "Grade 5", "Grade 8", "Grade 10"],
-    correct: 1,
-    topic: "Politics",
-  },
-  {
-    id: 49,
-    question: "The Biodiversity COP16 held in 2024 was in which city?",
-    options: ["Nairobi", "Cali", "Montreal", "Kunming"],
-    correct: 1,
-    topic: "Environment",
-  },
-  {
-    id: 50,
-    question:
-      "India's total installed renewable energy capacity crossed which milestone in 2024?",
-    options: ["200 GW", "250 GW", "300 GW", "350 GW"],
-    correct: 1,
-    topic: "Environment",
-  },
-];
+async function loadAllData(): Promise<DayData[]> {
+  const modules = await Promise.all([
+    import("../data/january2025Part1"),
+    import("../data/january2025Part2"),
+    import("../data/february2025Part1"),
+    import("../data/february2025Part2"),
+    import("../data/march2025Part1"),
+    import("../data/march2025Part2"),
+    import("../data/april2025Part1"),
+    import("../data/april2025Part2"),
+    import("../data/may2025Part1"),
+    import("../data/may2025Part2"),
+    import("../data/june2025Part1"),
+    import("../data/june2025Part2"),
+    import("../data/july2025Part1"),
+  ]);
+  return [
+    ...modules[0].january2025Part1,
+    ...modules[1].january2025Part2,
+    ...modules[2].february2025Part1,
+    ...modules[3].february2025Part2,
+    ...modules[4].march2025Part1,
+    ...modules[5].march2025Part2,
+    ...modules[6].april2025Part1,
+    ...modules[7].april2025Part2,
+    ...modules[8].may2025Part1,
+    ...modules[9].may2025Part2,
+    ...modules[10].june2025Part1,
+    ...modules[11].june2025Part2,
+    ...modules[12].july2025Part1,
+  ];
+}
+
+function buildMockQuestions(days: DayData[]): Question[] {
+  const all: Question[] = [];
+  let id = 1;
+  for (const day of days) {
+    for (const news of day.news) {
+      all.push({
+        id: id++,
+        question: news.mcq.question,
+        options: news.mcq.options,
+        correct: news.mcq.correctIndex,
+        topic: news.category,
+      });
+    }
+  }
+  // Shuffle using Fisher-Yates
+  for (let i = all.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [all[i], all[j]] = [all[j], all[i]];
+  }
+  // Return up to 50 questions
+  return all.slice(0, 50);
+}
 
 type Status = "not-visited" | "not-attempted" | "answered" | "marked";
 
@@ -539,6 +145,8 @@ const TOPIC_COLORS: Record<string, string> = {
 };
 
 export function MockTest({ onNavigateHome }: { onNavigateHome?: () => void }) {
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questionsLoading, setQuestionsLoading] = useState(true);
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<(number | null)[]>(
     Array(50).fill(null),
@@ -554,6 +162,14 @@ export function MockTest({ onNavigateHome }: { onNavigateHome?: () => void }) {
   const [startTime] = useState(Date.now());
   const incrementTestsAttempted = useIncrementTestsAttempted();
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Load questions from real CA data
+  useEffect(() => {
+    loadAllData().then((days) => {
+      setQuestions(buildMockQuestions(days));
+      setQuestionsLoading(false);
+    });
+  }, []);
 
   // Mark current as visited on mount / change
   useEffect(() => {
@@ -635,7 +251,7 @@ export function MockTest({ onNavigateHome }: { onNavigateHome?: () => void }) {
   function handleSubmitConfirm() {
     clearInterval(timerRef.current!);
     const finalScore = answers.filter(
-      (a, i) => a === QUESTIONS[i].correct,
+      (a, i) => a === questions[i].correct,
     ).length;
     setSubmitted(true);
     setShowSubmitDialog(false);
@@ -644,7 +260,7 @@ export function MockTest({ onNavigateHome }: { onNavigateHome?: () => void }) {
   }
 
   const unanswered = answers.filter((a) => a === null).length;
-  const score = answers.filter((a, i) => a === QUESTIONS[i].correct).length;
+  const score = answers.filter((a, i) => a === questions[i].correct).length;
   const timeTaken = Math.floor((Date.now() - startTime) / 1000);
 
   function statusColor(s: Status, isCurrent: boolean): string {
@@ -654,6 +270,18 @@ export function MockTest({ onNavigateHome }: { onNavigateHome?: () => void }) {
     if (s === "not-attempted")
       return "bg-destructive/70 text-white border-destructive";
     return "bg-border text-muted-foreground border-border";
+  }
+
+  // ─── LOADING SCREEN ──────────────────────────────────────────────────────────
+  if (questionsLoading || questions.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-background">
+        <div className="text-center">
+          <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-muted-foreground text-sm">Loading questions…</p>
+        </div>
+      </div>
+    );
   }
 
   // ─── RESULTS SCREEN ───────────────────────────────────────────────────────
@@ -721,7 +349,7 @@ export function MockTest({ onNavigateHome }: { onNavigateHome?: () => void }) {
             Review All Questions
           </h2>
           <div className="flex flex-col gap-3">
-            {QUESTIONS.map((q, i) => {
+            {questions.map((q, i) => {
               const userAns = answers[i];
               const isCorrect = userAns === q.correct;
               const isSkipped = userAns === null;
@@ -805,7 +433,7 @@ export function MockTest({ onNavigateHome }: { onNavigateHome?: () => void }) {
     );
   }
 
-  const q = QUESTIONS[current];
+  const q = questions[current];
   const userAnswer = answers[current];
   const isLastQuestion = current === 49;
   const isFirstQuestion = current === 0;
@@ -903,7 +531,7 @@ export function MockTest({ onNavigateHome }: { onNavigateHome?: () => void }) {
                 ))}
               </div>
               <div className="grid grid-cols-5 gap-1.5">
-                {QUESTIONS.map((qItem, i) => (
+                {questions.map((qItem, i) => (
                   <QuestionPaletteButton
                     key={qItem.id}
                     index={i}
@@ -1073,7 +701,7 @@ export function MockTest({ onNavigateHome }: { onNavigateHome?: () => void }) {
               </button>
             </div>
             <div className="p-4 grid grid-cols-5 gap-2 overflow-y-auto">
-              {QUESTIONS.map((qItem2, i) => (
+              {questions.map((qItem2, i) => (
                 <QuestionPaletteButtonLg
                   key={qItem2.id}
                   index={i}

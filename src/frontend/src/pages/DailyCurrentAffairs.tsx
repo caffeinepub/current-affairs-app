@@ -1,15 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { april2025Part1 } from "@/data/april2025Part1";
-import { april2025Part2 } from "@/data/april2025Part2";
-import { february2025Part1 } from "@/data/february2025Part1";
-import { february2025Part2 } from "@/data/february2025Part2";
-import { january2025Part1 } from "@/data/january2025Part1";
 import type { NewsItem } from "@/data/january2025Part1";
-import { january2025Part2 } from "@/data/january2025Part2";
-import { march2025Part1 } from "@/data/march2025Part1";
-import { march2025Part2 } from "@/data/march2025Part2";
-import { may2025Part1 } from "@/data/may2025Part1";
-import { may2025Part2 } from "@/data/may2025Part2";
 import { getCategoryColor } from "@/lib/utils-ca";
 import {
   BookOpen,
@@ -20,7 +10,7 @@ import {
   Zap,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type TimeFilter = "Today" | "This Week" | "This Month" | "All Time";
 type CategoryFilter =
@@ -49,18 +39,41 @@ const CATEGORIES: CategoryFilter[] = [
   "Sports",
 ];
 
-const ALL_DAYS = [
-  ...january2025Part1,
-  ...january2025Part2,
-  ...february2025Part1,
-  ...february2025Part2,
-  ...march2025Part1,
-  ...march2025Part2,
-  ...april2025Part1,
-  ...april2025Part2,
-  ...may2025Part1,
-  ...may2025Part2,
-];
+type DayData = { date: string; news: NewsItem[] };
+
+async function loadAllDays(): Promise<DayData[]> {
+  const [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13] =
+    await Promise.all([
+      import("@/data/january2025Part1"),
+      import("@/data/january2025Part2"),
+      import("@/data/february2025Part1"),
+      import("@/data/february2025Part2"),
+      import("@/data/march2025Part1"),
+      import("@/data/march2025Part2"),
+      import("@/data/april2025Part1"),
+      import("@/data/april2025Part2"),
+      import("@/data/may2025Part1"),
+      import("@/data/may2025Part2"),
+      import("@/data/june2025Part1"),
+      import("@/data/june2025Part2"),
+      import("@/data/july2025Part1"),
+    ]);
+  return [
+    ...m1.january2025Part1,
+    ...m2.january2025Part2,
+    ...m3.february2025Part1,
+    ...m4.february2025Part2,
+    ...m5.march2025Part1,
+    ...m6.march2025Part2,
+    ...m7.april2025Part1,
+    ...m8.april2025Part2,
+    ...m9.may2025Part1,
+    ...m10.may2025Part2,
+    ...m11.june2025Part1,
+    ...m12.june2025Part2,
+    ...m13.july2025Part1,
+  ];
+}
 
 const OPTION_LABELS = ["A", "B", "C", "D"];
 
@@ -294,6 +307,7 @@ function getWeekStart(): string {
 }
 
 export function DailyCurrentAffairs() {
+  const [allDays, setAllDays] = useState<DayData[] | null>(null);
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("All Time");
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("All");
   const [importanceFilter, setImportanceFilter] =
@@ -302,9 +316,14 @@ export function DailyCurrentAffairs() {
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
   const [quickMode, setQuickMode] = useState(false);
 
+  useEffect(() => {
+    loadAllDays().then(setAllDays);
+  }, []);
+
   const filteredGroups = useMemo(() => {
+    if (!allDays) return [];
     if (dateOverride) {
-      const day = ALL_DAYS.find((d) => d.date === dateOverride);
+      const day = allDays.find((d) => d.date === dateOverride);
       if (!day) return [];
       let news =
         categoryFilter === "All"
@@ -324,13 +343,13 @@ export function DailyCurrentAffairs() {
     const now = new Date();
     const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
 
-    let days = ALL_DAYS;
+    let days = allDays;
     if (timeFilter === "Today") {
-      days = ALL_DAYS.filter((d) => d.date === today);
+      days = allDays.filter((d) => d.date === today);
     } else if (timeFilter === "This Week") {
-      days = ALL_DAYS.filter((d) => d.date >= weekStart && d.date <= today);
+      days = allDays.filter((d) => d.date >= weekStart && d.date <= today);
     } else if (timeFilter === "This Month") {
-      days = ALL_DAYS.filter((d) => d.date >= monthStart && d.date <= today);
+      days = allDays.filter((d) => d.date >= monthStart && d.date <= today);
     }
 
     const sorted = [...days].sort((a, b) => (a.date > b.date ? -1 : 1));
@@ -349,7 +368,14 @@ export function DailyCurrentAffairs() {
         return { date: day.date, news };
       })
       .filter((g) => g.news.length > 0);
-  }, [timeFilter, categoryFilter, importanceFilter, dateOverride, quickMode]);
+  }, [
+    allDays,
+    timeFilter,
+    categoryFilter,
+    importanceFilter,
+    dateOverride,
+    quickMode,
+  ]);
 
   function toggleItem(dateStr: string, id: string) {
     const key = `${dateStr}-${id}`;
@@ -357,6 +383,19 @@ export function DailyCurrentAffairs() {
   }
 
   let globalIdx = 0;
+
+  if (!allDays) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+          <p className="text-muted-foreground text-sm">
+            Loading current affairs…
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-6">

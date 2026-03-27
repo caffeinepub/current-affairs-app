@@ -12,26 +12,108 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
-import { april2025Part1 } from "../data/april2025Part1";
-import { april2025Part2 } from "../data/april2025Part2";
-import { april2025QuizPart1 } from "../data/april2025QuizPart1";
-import { april2025QuizPart2 } from "../data/april2025QuizPart2";
-import { february2025Part1 } from "../data/february2025Part1";
-import { february2025Part2 } from "../data/february2025Part2";
-import { february2025QuizExtra } from "../data/february2025QuizExtra";
-import { february2025QuizPart2 } from "../data/february2025QuizPart2";
-import { type DayData, january2025Part1 } from "../data/january2025Part1";
-import { january2025Part2 } from "../data/january2025Part2";
-import { january2025QuizExtra } from "../data/january2025QuizExtra";
-import { january2025QuizExtraPart2 } from "../data/january2025QuizExtraPart2";
-import { march2025Part1 } from "../data/march2025Part1";
-import { march2025Part2 } from "../data/march2025Part2";
-import { march2025QuizPart1 } from "../data/march2025QuizPart1";
-import { march2025QuizPart2 } from "../data/march2025QuizPart2";
-import { may2025Part1 } from "../data/may2025Part1";
-import { may2025Part2 } from "../data/may2025Part2";
-import { may2025QuizPart1 } from "../data/may2025QuizPart1";
-import { may2025QuizPart2 } from "../data/may2025QuizPart2";
+import type { DayData } from "../data/january2025Part1";
+type QuizExtra = {
+  newsId: string;
+  mcq: {
+    question: string;
+    options: [string, string, string, string];
+    correctIndex: number;
+    explanation: string;
+  };
+};
+
+async function loadAllQuizData(): Promise<{
+  days: DayData[];
+  extras: QuizExtra[];
+}> {
+  const [
+    m1,
+    m2,
+    m3,
+    m4,
+    m5,
+    m6,
+    m7,
+    m8,
+    m9,
+    m10,
+    m11,
+    m12,
+    m13,
+    q1,
+    q2,
+    q3,
+    q4,
+    q5,
+    q6,
+    q7,
+    q8,
+    q9,
+    q10,
+    q11,
+    q12,
+    q13,
+  ] = await Promise.all([
+    import("../data/january2025Part1"),
+    import("../data/january2025Part2"),
+    import("../data/february2025Part1"),
+    import("../data/february2025Part2"),
+    import("../data/march2025Part1"),
+    import("../data/march2025Part2"),
+    import("../data/april2025Part1"),
+    import("../data/april2025Part2"),
+    import("../data/may2025Part1"),
+    import("../data/may2025Part2"),
+    import("../data/june2025Part1"),
+    import("../data/june2025Part2"),
+    import("../data/july2025Part1"),
+    import("../data/january2025QuizExtra"),
+    import("../data/january2025QuizExtraPart2"),
+    import("../data/february2025QuizExtra"),
+    import("../data/february2025QuizPart2"),
+    import("../data/march2025QuizPart1"),
+    import("../data/march2025QuizPart2"),
+    import("../data/april2025QuizPart1"),
+    import("../data/april2025QuizPart2"),
+    import("../data/may2025QuizPart1"),
+    import("../data/may2025QuizPart2"),
+    import("../data/june2025QuizPart1"),
+    import("../data/june2025QuizPart2"),
+    import("../data/july2025QuizPart1"),
+  ]);
+  const days: DayData[] = [
+    ...m1.january2025Part1,
+    ...m2.january2025Part2,
+    ...m3.february2025Part1,
+    ...m4.february2025Part2,
+    ...m5.march2025Part1,
+    ...m6.march2025Part2,
+    ...m7.april2025Part1,
+    ...m8.april2025Part2,
+    ...m9.may2025Part1,
+    ...m10.may2025Part2,
+    ...m11.june2025Part1,
+    ...m12.june2025Part2,
+    ...m13.july2025Part1,
+  ];
+  const extras: QuizExtra[] = [
+    ...q1.january2025QuizExtra,
+    ...q2.january2025QuizExtraPart2,
+    ...q3.february2025QuizExtra,
+    ...q4.february2025QuizPart2,
+    ...q5.march2025QuizPart1,
+    ...q6.march2025QuizPart2,
+    ...q7.april2025QuizPart1,
+    ...q8.april2025QuizPart2,
+    ...q9.may2025QuizPart1,
+    ...q10.may2025QuizPart2,
+    ...q11.june2025QuizPart1,
+    ...q12.june2025QuizPart2,
+    ...q13.july2025QuizPart1,
+  ];
+  return { days, extras };
+}
 
 type QuizQuestion = {
   newsTitle: string;
@@ -43,7 +125,7 @@ type QuizQuestion = {
 
 type Screen = "day-selector" | "quiz" | "results";
 
-function buildQuestions(day: DayData): QuizQuestion[] {
+function buildQuestions(day: DayData, extras: QuizExtra[]): QuizQuestion[] {
   const questions: QuizQuestion[] = [];
   for (const news of day.news) {
     questions.push({
@@ -53,17 +135,7 @@ function buildQuestions(day: DayData): QuizQuestion[] {
       correctIndex: news.mcq.correctIndex,
       explanation: news.mcq.explanation,
     });
-    const extra =
-      january2025QuizExtra.find((e) => e.newsId === news.id) ??
-      january2025QuizExtraPart2.find((e) => e.newsId === news.id) ??
-      february2025QuizExtra.find((e) => e.newsId === news.id) ??
-      february2025QuizPart2.find((e) => e.newsId === news.id) ??
-      march2025QuizPart1.find((e) => e.newsId === news.id) ??
-      march2025QuizPart2.find((e) => e.newsId === news.id) ??
-      april2025QuizPart1.find((e) => e.newsId === news.id) ??
-      april2025QuizPart2.find((e) => e.newsId === news.id) ??
-      may2025QuizPart1.find((e) => e.newsId === news.id) ??
-      may2025QuizPart2.find((e) => e.newsId === news.id);
+    const extra = extras.find((e) => e.newsId === news.id);
     if (extra) {
       questions.push({
         newsTitle: news.title,
@@ -97,6 +169,8 @@ function storeScore(dateStr: string, score: number) {
 }
 
 export function CAQuiz({ onNavigateHome }: { onNavigateHome?: () => void }) {
+  const [allDays, setAllDays] = useState<DayData[] | null>(null);
+  const [allExtras, setAllExtras] = useState<QuizExtra[]>([]);
   const [screen, setScreen] = useState<Screen>("day-selector");
   const [selectedDay, setSelectedDay] = useState<DayData | null>(null);
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
@@ -106,26 +180,19 @@ export function CAQuiz({ onNavigateHome }: { onNavigateHome?: () => void }) {
   const [scores, setScores] = useState<Record<string, number | null>>({});
 
   useEffect(() => {
-    const loaded: Record<string, number | null> = {};
-    for (const day of [
-      ...january2025Part1,
-      ...january2025Part2,
-      ...february2025Part1,
-      ...february2025Part2,
-      ...march2025Part1,
-      ...march2025Part2,
-      ...april2025Part1,
-      ...april2025Part2,
-      ...may2025Part1,
-      ...may2025Part2,
-    ]) {
-      loaded[day.date] = getStoredScore(day.date);
-    }
-    setScores(loaded);
+    loadAllQuizData().then(({ days, extras }) => {
+      setAllDays(days);
+      setAllExtras(extras);
+      const loaded: Record<string, number | null> = {};
+      for (const day of days) {
+        loaded[day.date] = getStoredScore(day.date);
+      }
+      setScores(loaded);
+    });
   }, []);
 
   function startQuiz(day: DayData) {
-    const qs = buildQuestions(day);
+    const qs = buildQuestions(day, allExtras);
     setSelectedDay(day);
     setQuestions(qs);
     setCurrentQ(0);
@@ -177,64 +244,147 @@ export function CAQuiz({ onNavigateHome }: { onNavigateHome?: () => void }) {
             </p>
           </div>
 
-          {[
-            { label: "January 2025 (1–15)", days: january2025Part1 },
-            { label: "January 2025 (16–31)", days: january2025Part2 },
-            { label: "February 2025 (1–15)", days: february2025Part1 },
-            { label: "February 2025 (16–28)", days: february2025Part2 },
-            { label: "March 2025 (1–15)", days: march2025Part1 },
-            { label: "March 2025 (16–31)", days: march2025Part2 },
-            { label: "April 2025 (1–15)", days: april2025Part1 },
-            { label: "April 2025 (16–30)", days: april2025Part2 },
-            { label: "May 2025 (1–15)", days: may2025Part1 },
-            { label: "May 2025 (16–31)", days: may2025Part2 },
-          ].map(({ label, days }) => (
-            <div key={label} className="mb-6">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                {label}
-              </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                {days.map((day) => {
-                  const score = scores[day.date];
-                  const completed = score !== null && score !== undefined;
-                  return (
-                    <motion.button
-                      key={day.date}
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() => startQuiz(day)}
-                      data-ocid="ca_quiz.day_selector.button"
-                      className={`relative flex flex-col items-center justify-center gap-1.5 p-4 rounded-xl border transition-all text-left ${
-                        completed
-                          ? "bg-slate-800 border-blue-600/50"
-                          : "bg-card border-border hover:border-primary/50"
-                      }`}
-                    >
-                      {completed && (
-                        <span className="absolute top-2 right-2">
-                          <CheckCircle className="w-4 h-4 text-green-400" />
+          {(() => {
+            if (!allDays) {
+              return (
+                <div className="flex items-center justify-center py-16">
+                  <div className="text-center">
+                    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                    <p className="text-muted-foreground text-sm">
+                      Loading quiz data…
+                    </p>
+                  </div>
+                </div>
+              );
+            }
+            const GROUPS = [
+              {
+                label: "January 2025 (1–15)",
+                days: allDays.filter(
+                  (d) => d.date >= "2025-01-01" && d.date <= "2025-01-15",
+                ),
+              },
+              {
+                label: "January 2025 (16–31)",
+                days: allDays.filter(
+                  (d) => d.date >= "2025-01-16" && d.date <= "2025-01-31",
+                ),
+              },
+              {
+                label: "February 2025 (1–15)",
+                days: allDays.filter(
+                  (d) => d.date >= "2025-02-01" && d.date <= "2025-02-15",
+                ),
+              },
+              {
+                label: "February 2025 (16–28)",
+                days: allDays.filter(
+                  (d) => d.date >= "2025-02-16" && d.date <= "2025-02-28",
+                ),
+              },
+              {
+                label: "March 2025 (1–15)",
+                days: allDays.filter(
+                  (d) => d.date >= "2025-03-01" && d.date <= "2025-03-15",
+                ),
+              },
+              {
+                label: "March 2025 (16–31)",
+                days: allDays.filter(
+                  (d) => d.date >= "2025-03-16" && d.date <= "2025-03-31",
+                ),
+              },
+              {
+                label: "April 2025 (1–15)",
+                days: allDays.filter(
+                  (d) => d.date >= "2025-04-01" && d.date <= "2025-04-15",
+                ),
+              },
+              {
+                label: "April 2025 (16–30)",
+                days: allDays.filter(
+                  (d) => d.date >= "2025-04-16" && d.date <= "2025-04-30",
+                ),
+              },
+              {
+                label: "May 2025 (1–15)",
+                days: allDays.filter(
+                  (d) => d.date >= "2025-05-01" && d.date <= "2025-05-15",
+                ),
+              },
+              {
+                label: "May 2025 (16–31)",
+                days: allDays.filter(
+                  (d) => d.date >= "2025-05-16" && d.date <= "2025-05-31",
+                ),
+              },
+              {
+                label: "June 2025 (1–15)",
+                days: allDays.filter(
+                  (d) => d.date >= "2025-06-01" && d.date <= "2025-06-15",
+                ),
+              },
+              {
+                label: "June 2025 (16–30)",
+                days: allDays.filter(
+                  (d) => d.date >= "2025-06-16" && d.date <= "2025-06-30",
+                ),
+              },
+              {
+                label: "July 2025 (1–15)",
+                days: allDays.filter(
+                  (d) => d.date >= "2025-07-01" && d.date <= "2025-07-15",
+                ),
+              },
+            ].filter((g) => g.days.length > 0);
+            return GROUPS.map(({ label, days }) => (
+              <div key={label} className="mb-6">
+                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                  {label}
+                </h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                  {days.map((day) => {
+                    const score = scores[day.date];
+                    const completed = score !== null && score !== undefined;
+                    return (
+                      <motion.button
+                        key={day.date}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => startQuiz(day)}
+                        data-ocid="ca_quiz.day_selector.button"
+                        className={`relative flex flex-col items-center justify-center gap-1.5 p-4 rounded-xl border transition-all text-left ${
+                          completed
+                            ? "bg-slate-800 border-blue-600/50"
+                            : "bg-card border-border hover:border-primary/50"
+                        }`}
+                      >
+                        {completed && (
+                          <span className="absolute top-2 right-2">
+                            <CheckCircle className="w-4 h-4 text-green-400" />
+                          </span>
+                        )}
+                        <span className="text-xs text-muted-foreground font-medium">
+                          Jan 2025
                         </span>
-                      )}
-                      <span className="text-xs text-muted-foreground font-medium">
-                        Jan 2025
-                      </span>
-                      <span className="text-xl font-bold text-foreground">
-                        {new Date(`${day.date}T00:00:00`).getDate()}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground">
-                        10 Qs
-                      </span>
-                      {completed && (
-                        <Badge className="text-[10px] px-1.5 py-0 bg-blue-700 text-white border-0">
-                          {score}/10
-                        </Badge>
-                      )}
-                    </motion.button>
-                  );
-                })}
+                        <span className="text-xl font-bold text-foreground">
+                          {new Date(`${day.date}T00:00:00`).getDate()}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">
+                          10 Qs
+                        </span>
+                        {completed && (
+                          <Badge className="text-[10px] px-1.5 py-0 bg-blue-700 text-white border-0">
+                            {score}/10
+                          </Badge>
+                        )}
+                      </motion.button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            ));
+          })()}
         </div>
       </div>
     );

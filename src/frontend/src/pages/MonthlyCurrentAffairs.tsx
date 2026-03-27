@@ -1,14 +1,4 @@
-import { april2025Part1 } from "@/data/april2025Part1";
-import { april2025Part2 } from "@/data/april2025Part2";
-import { february2025Part1 } from "@/data/february2025Part1";
-import { february2025Part2 } from "@/data/february2025Part2";
-import { january2025Part1 } from "@/data/january2025Part1";
 import type { NewsItem } from "@/data/january2025Part1";
-import { january2025Part2 } from "@/data/january2025Part2";
-import { march2025Part1 } from "@/data/march2025Part1";
-import { march2025Part2 } from "@/data/march2025Part2";
-import { may2025Part1 } from "@/data/may2025Part1";
-import { may2025Part2 } from "@/data/may2025Part2";
 import { getCategoryColor } from "@/lib/utils-ca";
 import jsPDF from "jspdf";
 import {
@@ -27,24 +17,47 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 type DayData = { date: string; news: NewsItem[] };
 
-const ALL_DAYS: DayData[] = [
-  ...january2025Part1,
-  ...january2025Part2,
-  ...february2025Part1,
-  ...february2025Part2,
-  ...march2025Part1,
-  ...march2025Part2,
-  ...april2025Part1,
-  ...april2025Part2,
-  ...may2025Part1,
-  ...may2025Part2,
-];
+async function loadAllDays(): Promise<DayData[]> {
+  const [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13] =
+    await Promise.all([
+      import("@/data/january2025Part1"),
+      import("@/data/january2025Part2"),
+      import("@/data/february2025Part1"),
+      import("@/data/february2025Part2"),
+      import("@/data/march2025Part1"),
+      import("@/data/march2025Part2"),
+      import("@/data/april2025Part1"),
+      import("@/data/april2025Part2"),
+      import("@/data/may2025Part1"),
+      import("@/data/may2025Part2"),
+      import("@/data/june2025Part1"),
+      import("@/data/june2025Part2"),
+      import("@/data/july2025Part1"),
+    ]);
+  return [
+    ...m1.january2025Part1,
+    ...m2.january2025Part2,
+    ...m3.february2025Part1,
+    ...m4.february2025Part2,
+    ...m5.march2025Part1,
+    ...m6.march2025Part2,
+    ...m7.april2025Part1,
+    ...m8.april2025Part2,
+    ...m9.may2025Part1,
+    ...m10.may2025Part2,
+    ...m11.june2025Part1,
+    ...m12.june2025Part2,
+    ...m13.july2025Part1,
+  ];
+}
 
 const AVAILABLE_MONTHS = [
   { year: 2025, month: 1, label: "January 2025" },
   { year: 2025, month: 2, label: "February 2025" },
   { year: 2025, month: 3, label: "March 2025" },
   { year: 2025, month: 4, label: "April 2025" },
+  { year: 2025, month: 5, label: "May 2025" },
+  { year: 2025, month: 6, label: "June 2025 (1-15)" },
 ];
 
 const CATEGORY_COLORS: Record<
@@ -1003,6 +1016,7 @@ function AccordionRow({
 }
 
 export function MonthlyCurrentAffairs() {
+  const [allDays, setAllDays] = useState<DayData[] | null>(null);
   const [monthIdx, setMonthIdx] = useState(0);
   const [categoryFilter, setCategoryFilter] = useState<string>("All");
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
@@ -1010,27 +1024,31 @@ export function MonthlyCurrentAffairs() {
   const [highlightsExpanded, setHighlightsExpanded] = useState(true);
   const [quickMode, setQuickMode] = useState(false);
 
+  useEffect(() => {
+    loadAllDays().then(setAllDays);
+  }, []);
+
   const currentMonth = AVAILABLE_MONTHS[monthIdx];
 
   const monthNews = useMemo(() => {
-    if (!currentMonth) return [];
+    if (!currentMonth || !allDays) return [];
     const { year, month } = currentMonth;
     const prefix = `${year}-${String(month).padStart(2, "0")}-`;
     const items: NewsItem[] = [];
-    for (const day of ALL_DAYS) {
+    for (const day of allDays) {
       if (day.date.startsWith(prefix)) {
         items.push(...day.news);
       }
     }
     return items;
-  }, [currentMonth]);
+  }, [currentMonth, allDays]);
 
   const monthDaysWithNews = useMemo(() => {
     if (!currentMonth) return 0;
     const { year, month } = currentMonth;
     const prefix = `${year}-${String(month).padStart(2, "0")}-`;
-    return ALL_DAYS.filter((d) => d.date.startsWith(prefix)).length;
-  }, [currentMonth]);
+    return (allDays ?? []).filter((d) => d.date.startsWith(prefix)).length;
+  }, [currentMonth, allDays]);
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -1059,7 +1077,7 @@ export function MonthlyCurrentAffairs() {
     const { year, month } = currentMonth;
     const prefix = `${year}-${String(month).padStart(2, "0")}-`;
     const withDates: { item: NewsItem; date: string }[] = [];
-    for (const day of ALL_DAYS) {
+    for (const day of allDays ?? []) {
       if (day.date.startsWith(prefix)) {
         for (const item of day.news) {
           if (categoryFilter === "All" || item.category === categoryFilter) {
@@ -1070,14 +1088,14 @@ export function MonthlyCurrentAffairs() {
     }
     withDates.sort((a, b) => (a.date < b.date ? -1 : 1));
     return withDates;
-  }, [currentMonth, categoryFilter]);
+  }, [currentMonth, categoryFilter, allDays]);
 
   const allMonthNewsWithDates = useMemo(() => {
     if (!currentMonth) return [];
     const { year, month } = currentMonth;
     const prefix = `${year}-${String(month).padStart(2, "0")}-`;
     const withDates: { item: NewsItem; date: string }[] = [];
-    for (const day of ALL_DAYS) {
+    for (const day of allDays ?? []) {
       if (day.date.startsWith(prefix)) {
         for (const item of day.news) {
           withDates.push({ item, date: day.date });
@@ -1086,7 +1104,7 @@ export function MonthlyCurrentAffairs() {
     }
     withDates.sort((a, b) => (a.date < b.date ? -1 : 1));
     return withDates;
-  }, [currentMonth]);
+  }, [currentMonth, allDays]);
 
   const quickRevisionNews = useMemo(() => {
     return sortedFilteredNews.filter(
@@ -1141,6 +1159,19 @@ export function MonthlyCurrentAffairs() {
     const items = quickMode ? quickRevisionNews : sortedFilteredNews;
     generateNewsImage(items, label, "filtered");
   };
+
+  if (!allDays) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+          <p className="text-muted-foreground text-sm">
+            Loading current affairs…
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-6">
